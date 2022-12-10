@@ -33,13 +33,13 @@ public class GameManager : MonoBehaviour
         else
             Destroy(this.gameObject);
 
+        DOTween.Init(true, false, LogBehaviour.ErrorsOnly).SetCapacity(200, 10);
     }
 
-    public void Restart() // 1회차 접속, 2회차 접속안함
+    public void Restart()
     {
-        DOTween.Init(true, false, LogBehaviour.ErrorsOnly);
-
         SceneManager.LoadScene(1);
+        DOTween.KillAll(true);
         E_reset();
     }
 
@@ -50,15 +50,18 @@ public class GameManager : MonoBehaviour
 
     void InitResetOptions()
     {
+        E_reset += FindObjectOfType<ItemCreator>().ResetOptions;
         E_reset += Character.Instance.ResetOptions;
         E_reset += InputManager.Instance.ResetOptions;
         E_reset += ObjPool.Instance.ResetOptions;
         E_reset += CharacterControll.Instance.ResetOptions;
+        
+        E_reset += EventManager.Instance.ResetOptions;
+        E_reset += RockCreator.Instance.ResetOptions;
         E_reset += CameraControll.Instance.ResetOptions;
         E_reset += Water.Instance.ResetOptions;
+        E_reset += CharacterAnim.Instance.ResetOptions;
     }
-
-
 
     public int Score
     {
@@ -109,22 +112,5 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool IsReady // 수정
-    {
-        get
-        {
-            return (Character.Instance.CurrentStair == null);
-        }
-    }
-
-    //bool _isPlaying;
-
-    //public bool IsPlaying
-    //{
-    //    get
-    //    {
-
-    //    }
-    //}
 
 }

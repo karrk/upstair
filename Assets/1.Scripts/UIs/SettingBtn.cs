@@ -8,32 +8,36 @@ using UnityEngine.EventSystems;
 public class SettingBtn : BaseButton
 {
     public GameObject _settingPanel;
+    Vector3 _initPos;
 
-    void Start()
+    public override void Init()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_START, OnEvent);
+        base.Init();
+
+        _initPos = this.transform.position;
+
+        if (!btn.interactable)
+            btn.interactable = true;
+
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent); // 2. 리스너 등록 후 이벤트 받기
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
     {
-        switch (eventType)
+        if(eventType == EVENT_TYPE.GAME_INPUT_SIGN)
         {
-            case EVENT_TYPE.GAME_START:
-                Debug.Log("상태변화 감지");
-                break;
+            if (this.transform.position == _initPos)
+            {
+                this.transform.DOMoveX(1920 / 3, 0.35f).SetEase(Ease.InBack);
+                btn.interactable = false;
+            }
         }
-    }
-
-    void FixedUpdate()
-    {
-
     }
 
     public override void BtnAction()
     {
         if (!_settingPanel.activeSelf)
             _settingPanel.SetActive(true);
-
     }
 
 

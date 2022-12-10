@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StairCreator : MonoBehaviour, IDistanceInfo
 {
-    public static float DISTANCE = 40f;
+    public static float DISTANCE = 100f;
 
     const float StartPercent = 0.7f;
     const float MinPercent = 0.1f;

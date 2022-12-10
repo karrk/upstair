@@ -4,8 +4,11 @@ using UnityEngine;
 
 public enum EVENT_TYPE
 {
-    GAME_START,
-    GAME_PAUSE,
+    CRASH,
+    GAME_INPUT_SIGN,
+    CHARACTER_DEAD,
+    CHARACTER_JUMP,
+    CAMERA_SHAKE,
     SCORE_10,
     SCORE_100,
     SCORE_1000,
@@ -44,6 +47,14 @@ public class EventManager : MonoBehaviour
     private Dictionary<EVENT_TYPE, List<OnEvent>> _listeners
         = new Dictionary<EVENT_TYPE, List<OnEvent>>();
 
+    public void ResetOptions()
+    {
+        foreach (var item in _listeners)
+        {
+            if (!item.Value.Equals(null))
+                item.Value.RemoveRange(0, item.Value.Count);
+        }
+    }
 
     public void AddListener(EVENT_TYPE eventType, OnEvent listener)
     {

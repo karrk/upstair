@@ -51,7 +51,7 @@ public class InputManager : MonoBehaviour
         set
         {
             if (value != DragType.None)
-                EventManager.Instance.PostNotification(EVENT_TYPE.GAME_START, this);
+                EventManager.Instance.PostNotification(EVENT_TYPE.GAME_INPUT_SIGN, this); // 1. 이벤트 알림
             
             _inputType = value;
         }

@@ -40,7 +40,7 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
         _spawnPos = StartCreatePos;
         _rand = new System.Random(System.Guid.NewGuid().GetHashCode());
 
-        GameManager.Instance.E_reset += ResetOptions;
+        //GameManager.Instance.E_reset += ResetOptions;
         InitGenerationPercent();
     }
 

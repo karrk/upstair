@@ -7,14 +7,19 @@ using DG.Tweening;
 public class BaseButton : MonoBehaviour
 {
     const float PunchValue = -0.2f;
-    
+    protected Button btn;
     Vector3 punch;
 
     void Start()
     {
+        Init();
+    }
+
+    public virtual void Init()
+    {
         punch = new Vector3(PunchValue, PunchValue, PunchValue);
 
-        Button btn = this.GetComponent<Button>();
+        btn = this.GetComponent<Button>();
 
         btn.onClick.AddListener(() => BtnAnimation());
         btn.onClick.AddListener(() => StartCoroutine(WaitBtnAction(0.1f)));

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class CameraControll : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class CameraControll : MonoBehaviour
         }
     }
 
+    const float ShakeMaxPower = 0.3f;
+    const float ShakeMinPower = 0.001f;
+    float inclination;
+
     void Awake()
     {
         if (_instance == null)
@@ -28,7 +33,8 @@ public class CameraControll : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-            
+
+        inclination = -(ShakeMaxPower - ShakeMinPower) / StairCreator.DISTANCE; // 기울기 계산
     }
 
     [Range(0.01f, 1)]
@@ -40,17 +46,33 @@ public class CameraControll : MonoBehaviour
 
     void Start()
     {
+        EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
         _initPos = this.transform.position;
     }
 
     public void ResetOptions()
     {
         this.transform.position = _initPos;
+        EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
     }
 
     void FixedUpdate()
     {
         MoveCamera();
+    }
+
+    void OnEvent(EVENT_TYPE eventType, Component component, object param = null)
+    {
+        if (eventType == EVENT_TYPE.CAMERA_SHAKE)
+        {
+            this.transform.DOShakePosition(0.3f, CalculateShakePower((float)param), 30);
+        }
+    }
+
+    float CalculateShakePower(float distance)
+    {
+        float power = (inclination * distance) + ShakeMaxPower;
+        return power;
     }
 
     void MoveCamera()
@@ -61,11 +83,13 @@ public class CameraControll : MonoBehaviour
             return;
         }
 
-        this.transform.position = Vector3.Slerp(
-        this.transform.position,
-        AddVector(Character.Instance.Pos),
-        _camSpeed
-        );
+        this.transform.DOMove(AddVector(Character.Instance.Pos), 0.5f).SetAutoKill(true);
+
+        //this.transform.position = Vector3.Slerp(
+        //this.transform.position,
+        //AddVector(Character.Instance.Pos),
+        //_camSpeed
+        //);
     }
 
     Vector3 AddVector(Vector3 offsetPos)

@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class BasePanel : MonoBehaviour, IPanel
 {
-    protected virtual Vector3 InitPos { get; set; }
+    protected Vector3 _initPos;
 
     void Start()
     {
-        InitPos = transform.position;
+        Init();
+    }
+
+    protected virtual void Init()
+    {
+        _initPos = transform.position;
     }
 
     public void PanelAction()

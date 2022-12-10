@@ -18,7 +18,20 @@ public class CharacterControll : MonoBehaviour
         }
     }
 
-    bool isJump = false;
+    bool _isJump = false;
+
+    public bool IsJump
+    {
+        get { return _isJump; }
+        set
+        {
+            if(value == true && _isJump == false)
+            {
+                EventManager.Instance.PostNotification(EVENT_TYPE.CHARACTER_JUMP, this, value);
+            }
+            _isJump = value;
+        }
+    }
 
     void Awake()
     {
@@ -60,7 +73,7 @@ public class CharacterControll : MonoBehaviour
 
     public void CheckJumpType(InputManager.DragType slide)
     {
-        if (isJump)
+        if (_isJump)
             return;
 
         switch (slide)
@@ -88,22 +101,22 @@ public class CharacterControll : MonoBehaviour
 
     public void Jump(Vector3 targetPos, float jumpPower = 0.8f, float duration = 0.16f)
     {
-        transform.DOJump(targetPos, jumpPower, 1, duration);
-        isJump = true;
+        transform.DOJump(targetPos, jumpPower, 1, duration).SetAutoKill(false);
+        IsJump = true;
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Stair"))
         {
-            isJump = false;
+            _isJump = false;
         }
     }
 
     public void ResetOptions()
     {
         InitJumpPos();
-        isJump = false;
+        _isJump = false;
     }
 
     

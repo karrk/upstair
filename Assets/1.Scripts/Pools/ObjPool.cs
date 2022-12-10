@@ -53,6 +53,7 @@ public class ObjPool : MonoBehaviour
 
     Stack<GameObject> _jumpItemPool = new Stack<GameObject>();
     Stack<GameObject> _superJumpItemPool = new Stack<GameObject>();
+
     #endregion
 
     #region 프리팹 종류
@@ -64,6 +65,7 @@ public class ObjPool : MonoBehaviour
     [Space (10f)]
     public GameObject _jumpItem;
     public GameObject _superJumpItem;
+
     #endregion
 
     #region PoolType 종류
@@ -74,6 +76,7 @@ public class ObjPool : MonoBehaviour
 
     ObjectPoolType _jumpItemPoolType;
     ObjectPoolType _superJumpItemPoolType;
+
     #endregion
 
     public List<ObjectPoolType> _stairTypeList = new List<ObjectPoolType>();

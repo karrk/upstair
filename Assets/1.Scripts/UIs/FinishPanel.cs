@@ -9,13 +9,13 @@ public class FinishPanel : BasePanel
     {
         if (Character.Instance.IsDead)
         {
-            if (this.transform.position == InitPos)
+            if (this.transform.position == _initPos)
                 UpLoadPanel();
         }
     }
 
     protected override void MyAction()
     {
-        transform.DOMoveY(0, 1f);
+        transform.DOMoveY(0, 0.8f);
     }
 }

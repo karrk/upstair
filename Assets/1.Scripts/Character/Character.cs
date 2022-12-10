@@ -52,7 +52,7 @@ public class Character : MonoBehaviour
         get { return _isDead; }
     }
 
-    JumpPosControll JumpPosControll;
+    JumpPosControll _jumpPosControll;
 
     void Awake()
     {
@@ -69,11 +69,12 @@ public class Character : MonoBehaviour
     {
         _initPos = this.transform.position;
 
-        JumpPosControll = FindObjectOfType<JumpPosControll>();
+        _jumpPosControll = FindObjectOfType<JumpPosControll>();
 
         _lastPosY = Pos.y;
 
-        E_colStair += JumpPosControll.Move;
+        E_colStair += _jumpPosControll.Move;
+        E_colStair += RockCreator.Instance.Move;
 
     }
 
@@ -122,12 +123,21 @@ public class Character : MonoBehaviour
 
     public void ResetOptions()
     {
-
         this.transform.position = _initPos;
         _currentStair = null;
         _item = null;
         _pos = _initPos;
         UpdateLastPos();
         _isDead = false;
+    }
+
+    public void CrushKill()
+    {
+        if (!_isDead)
+        {
+            _isDead = true;
+            GetComponent<CharacterAnim>().PlayCruchKillAnim();
+        }
+        
     }
 }

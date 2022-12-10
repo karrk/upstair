@@ -46,19 +46,38 @@ public class Water : MonoBehaviour
 
     Vector3 _initPos;
 
+    bool _isStart = false;
+
     public void ResetOptions()
     {
         this.transform.position = _initPos;
+        _isStart = false;
+        Init();
     }
 
     void Start()
     {
         _initPos = this.transform.position;
+        Init();
+    }
+
+    void Init()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+    }
+
+    void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    {
+        if(eventType == EVENT_TYPE.GAME_INPUT_SIGN)
+        {
+            if (!_isStart)
+                _isStart = true;
+        }
     }
 
     void FixedUpdate()
     {
-        if (GameManager.Instance.IsReady)
+        if (!_isStart)
             return;
 
         this.transform.position =
