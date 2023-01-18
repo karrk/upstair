@@ -46,6 +46,8 @@ public class CharacterControll : MonoBehaviour
 
     Dictionary<int, Transform> _jumpPosDic;
 
+    Rigidbody _rb;
+
     enum JumpPos
     {
         SINGLE,
@@ -57,23 +59,26 @@ public class CharacterControll : MonoBehaviour
     void Start()
     {
         InitJumpPos();
+        _rb = this.GetComponent<Rigidbody>();
     }
 
     void InitJumpPos()
     {
         _jumpPosDic = new Dictionary<int, Transform>();
 
-        Transform jumpPosTr = FindObjectOfType<JumpPosControll>().transform;
+        Transform jumpPosTr = JumpPosControll.Instance.transform;
 
         for (int i = 0; i < 4; i++)
         {
             _jumpPosDic.Add(i, jumpPosTr.GetChild(i));
         }
+
+        
     }
 
     public void CheckJumpType(InputManager.DragType slide)
     {
-        if (_isJump)
+        if (_isJump || Character.Instance.IsDead)
             return;
 
         switch (slide)
@@ -101,7 +106,7 @@ public class CharacterControll : MonoBehaviour
 
     public void Jump(Vector3 targetPos, float jumpPower = 0.8f, float duration = 0.16f)
     {
-        transform.DOJump(targetPos, jumpPower, 1, duration).SetAutoKill(false);
+        transform.DOJump(targetPos, jumpPower, 1, duration);//.SetAutoKill(false);  // 시점을잡고 Kill
         IsJump = true;
     }
 
@@ -117,6 +122,34 @@ public class CharacterControll : MonoBehaviour
     {
         InitJumpPos();
         _isJump = false;
+
+        if (_rb == null)
+            this.GetComponent<Rigidbody>();
+
+        //FloattingMode(false);
+
+        SetConstraints(true);
+    }
+
+    public void SetConstraints(bool setValue)
+    {
+        if (!setValue)
+        {
+            _rb.constraints = RigidbodyConstraints.None;
+        }
+        else
+        {
+            _rb.constraints = RigidbodyConstraints.FreezeRotation;
+        }
+    }
+
+    public void FloattingMode(bool setValue)
+    {
+        StylizedWater2.FloatingTransform floating 
+            = this.GetComponent<StylizedWater2.FloatingTransform>();
+
+        floating.enabled = setValue;
+        _rb.isKinematic = setValue;
     }
 
     

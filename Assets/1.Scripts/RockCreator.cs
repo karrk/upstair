@@ -21,14 +21,13 @@ public class RockCreator : MonoBehaviour
 
     public static List<Rock> _rockList;
 
-    //const float MaximumTime = 15f;
-    //const float StartFirstTime = 13f;
-    //const float MinimumTime = 5f;
+    const float MaximumTime = 15f;
+    const float StartFirstTime = 13f;
+    const float MinimumTime = 5f;
 
-    //TEST
-    const float MaximumTime = 5f;
-    const float StartFirstTime = 2f;
-    const float MinimumTime = 1f;
+    //const float MaximumTime = 5f;
+    //const float StartFirstTime = 2f;
+    //const float MinimumTime = 1f;
 
     List<float> _timeList = new List<float>();
     /*
@@ -56,10 +55,6 @@ public class RockCreator : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-            
-
-        if (_rockList == null)
-            _rockList = new List<Rock>();
     }
 
     void Start()
@@ -67,6 +62,8 @@ public class RockCreator : MonoBehaviour
         _createOffsetPos = InitCreateOffsetPos;
         InitGenerationTimes();
         _timer = MaximumTime;
+
+        _rockList = new List<Rock>();
     }
 
     void InitGenerationTimes()
@@ -103,12 +100,7 @@ public class RockCreator : MonoBehaviour
 
     void RockClear()
     {
-        foreach (var item in _rockList)
-        {
-            Destroy(item.gameObject);
-        }
-
-        _rockList = null;
+        _rockList = new List<Rock>();
     }
 
     public static void AddRock(Rock rockObj)

@@ -8,12 +8,13 @@ public class BasePanel : MonoBehaviour, IPanel
 
     void Start()
     {
+        _initPos = transform.position;
         Init();
     }
 
     protected virtual void Init()
     {
-        _initPos = transform.position;
+        
     }
 
     public void PanelAction()

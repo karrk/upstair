@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Stair : MonoBehaviour , IStairType
 {
@@ -12,23 +11,27 @@ public class Stair : MonoBehaviour , IStairType
 
     public Vector3 BasePos
     {
-        get { return _basePos; }
+        get { return GetBasePos(); }
     }
+
+    public bool isMetroLine = false;
+    public bool isOnlyMid = false;
 
     void OnEnable()
     {
+        isMetroLine = false;
         transform.position = StairCreator._spawnPos;
     }
 
     void Start()
     {
-        _basePos = SetBasePos();
+        //_basePos = SetBasePos();
 
         Transform myParent = this.transform.parent.Find("StairPool");
         this.transform.SetParent(myParent);
     }
 
-    Vector3 SetBasePos() // OCP
+    Vector3 GetBasePos() // OCP
     {
         switch (ObjType)
         {
@@ -40,12 +43,23 @@ public class Stair : MonoBehaviour , IStairType
                 return new Vector3(1, 0, 0);
             case ObjPool.StairType.RIGHT:
                 return new Vector3(5, 0, 0);
+
+            case ObjPool.StairType.CIRCLE:
+                {
+                    isOnlyMid = true;
+                    return new Vector3(3, 0, 0);
+                }
+            case ObjPool.StairType.CIRCLE_LEFT:
+                return new Vector3(1, 0, 0);
+            case ObjPool.StairType.CIRCLE_RIGHT:
+                return new Vector3(5, 0, 0);
+
             default:
-                return Vector3.zero;
+                return new Vector3(3, 0, 0);
         }
     }
 
-    void Update()
+    void FixedUpdate() // 이거좀 큰문제인듯 ()
     {
         if(this.transform.position.y+ IStairType.ReturnDistance <= Character.Instance.Pos.y)
         {

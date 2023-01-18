@@ -10,11 +10,25 @@ public class SidePanel : BasePanel
 
     protected override void Init()
     {
-        base.Init();
         SetBtns(true);
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+
         image = GetComponent<Image>();
         image.raycastTarget = true;
+
+        GameManager.Instance.E_reset += ResetOptions;
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+    }
+
+    void ResetOptions()
+    {
+        SetBtns(true);
+
+        GetComponent<RectTransform>().pivot = new Vector2(0, 0.5f);
+        image = GetComponent<Image>();
+        image.raycastTarget = true;
+
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+        transform.position = _initPos;
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
@@ -22,7 +36,10 @@ public class SidePanel : BasePanel
         if(eventType == EVENT_TYPE.GAME_INPUT_SIGN)
         {
             if(transform.position == _initPos && image.raycastTarget == true)
-            UpLoadPanel();
+            {
+                UpLoadPanel();
+            }
+            
         }
     }
 

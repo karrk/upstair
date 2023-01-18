@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class SettingBtn : BaseButton
 {
@@ -19,7 +17,17 @@ public class SettingBtn : BaseButton
         if (!btn.interactable)
             btn.interactable = true;
 
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent); // 2. 리스너 등록 후 이벤트 받기
+        GameManager.Instance.E_reset += ResetOptions;
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+    }
+
+    void ResetOptions()
+    {
+        if (!btn.interactable)
+            btn.interactable = true;
+
+        transform.position = _initPos;
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)

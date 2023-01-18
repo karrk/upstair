@@ -2,56 +2,101 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EffectType
+{
+    CrashFx,
+    SplashFx,
+}
+
 public class EffectManager : MonoBehaviour
 {
+    private static EffectManager _instance;
+
+    public static EffectManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+                return null;
+
+            return _instance;
+        }
+    }
+
+    void Awake()
+    {
+        if(_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
     [Space (10f)]
     public GameObject _crashFX;
-
-    List<GameObject> _crashFxList = new List<GameObject>();
+    public GameObject _splashFX;
 
     Vector3 _receivePos;
 
-    GameObject _fxObj;
+    //리시브 포지션을 받아서 해당 이펙트를 재생하는 방식이 좋을듯하다.
+    // PlayEffect(Vector3 sendPos,GameObject targetFX)
+
+    public ObjectFXType _crashFXPool;
+    public ObjectFXType _splashFXPool;
 
     void Start()
     {
-        Init(_crashFX, _crashFxList);
+        _crashFXPool = new ObjectFXType(new List<GameObject>(), EffectType.CrashFx, _crashFX);
+        _splashFXPool = new ObjectFXType(new List<GameObject>(), EffectType.SplashFx, _splashFX);
 
-        EventManager.Instance.AddListener(EVENT_TYPE.CRASH, OnEvent);
+        Init(5, _crashFXPool);
+        Init(5, _splashFXPool);
+
     }
 
-    void Init(GameObject fx, List<GameObject> targetList)
+    void Init(int count, ObjectFXType fxPool)
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < count; i++)
         {
-            GameObject obj = Instantiate(fx, this.transform);
-            targetList.Add(obj);
+            fxPool.Add(CreateEffect(fxPool));
         }
     }
 
-    void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    GameObject CreateEffect(ObjectFXType fxPool)
     {
-        if(eventType == EVENT_TYPE.CRASH)
-        {
-            _receivePos = (Vector3)param;
-            _fxObj = FindRestFX(_crashFxList);
+        GameObject obj = Instantiate(fxPool._prefabObj);
+        obj.transform.SetParent(transform);
 
-            _fxObj.transform.position = (Vector3)param;
-            _fxObj.GetComponent<ParticleSystem>().Play();
-        }
+        return obj;
     }
 
     GameObject FindRestFX(List<GameObject> targetFXList)
     {
-        GameObject targetObj = null;
-
         for (int i = 0; i < targetFXList.Count; i++)
         {
             if (!targetFXList[i].GetComponent<ParticleSystem>().isPlaying)
-                targetObj = targetFXList[i];
+                return targetFXList[i];
         }
 
-        return targetObj;
+        return null;
+    }
+
+    public void PlayEffect(Vector3 playPos, ObjectFXType fxPool)
+    {
+        GameObject restingFX = FindRestFX(fxPool._list);
+
+        if(restingFX == null)
+        {
+            restingFX = CreateEffect(fxPool);
+        }
+
+        restingFX.transform.position = playPos;
+
+        restingFX.GetComponent<ParticleSystem>().Play();
     }
 
 

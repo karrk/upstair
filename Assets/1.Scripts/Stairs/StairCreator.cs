@@ -33,6 +33,8 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
 
     public void ResetOptions()
     {
+        _stairNumber = 1;
+
         this.transform.position = _initPos;
         _spawnPos = StartCreatePos;
 
@@ -103,8 +105,6 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
             _spawnPos += new Vector3(0, 1, 1);
         }
     }
-
-    
 
     public bool isNearby(float specDistance)
     {

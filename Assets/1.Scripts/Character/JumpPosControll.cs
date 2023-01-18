@@ -4,17 +4,38 @@ using UnityEngine;
 
 public class JumpPosControll : MonoBehaviour
 {
-    Vector3 _initPos;
+    private static JumpPosControll _instance;
+
+    public static JumpPosControll Instance
+    {
+        get
+        {
+            if (_instance == null)
+                return null;
+
+            return _instance;
+        }
+
+    }
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }
+
+    Vector3 _initPos;
 
     void Start()
     {
         _initPos = this.transform.position;
-        GameManager.Instance.E_reset += ResetOptions;
     }
 
     public void ResetOptions()

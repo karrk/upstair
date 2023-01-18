@@ -97,10 +97,6 @@ public class Rock : MonoBehaviour
                 transform.DOJump(_nextStairPos, 7, 1, _duration);
                 StartCoroutine(SetFalseCollider());
             }
-
-            // 다음 계단은 찾아서 목표지점으로 점프하는 과정 중간에
-            // 캐릭터가 올라가다가 계단이 사라지게되어
-            // 파괴되지 못하는 오브젝트가 있다.
         }
 
         else
@@ -145,41 +141,19 @@ public class Rock : MonoBehaviour
             if (other.TryGetComponent<Stair>(out Stair stair))
             {
                 _crashPos = stair.BasePos + stair.transform.position;
-                SendCrashPos(_crashPos);
+                //SendCrashPos(_crashPos);
+                EffectManager.Instance.PlayEffect(_crashPos, EffectManager.Instance._crashFXPool);
+                DeathManager.Instance.CallDeathPoint(_crashPos);
             }
         }
 
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Water"))
         {
-            Debug.Log("접근");
+            Vector3 offset = new Vector3(0, 4, 0);
 
-            if (other.TryGetComponent<CharacterControll>(out CharacterControll character))
-            {
-                if (!character.IsJump)
-                {
-                    Character.Instance.CrushKill();
-                }
-
-            }
+            EffectManager.Instance.PlayEffect(this.transform.position+offset, EffectManager.Instance._splashFXPool);
         }
     }
-
-    //void OnCollisionEnter(Collision collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Player"))
-    //    {
-
-
-    //        if (TryGetComponent<CharacterControll>(out CharacterControll character))
-    //        {
-    //            if (!character.IsJump)
-    //            {
-    //                Debug.Log("죽음");
-    //            }
-
-    //        }
-    //    }
-    //}
 
     void CamShake()
     {
@@ -188,10 +162,10 @@ public class Rock : MonoBehaviour
                 );
     }
 
-    void SendCrashPos(Vector3 pos)
-    {
-        EventManager.Instance.PostNotification(EVENT_TYPE.CRASH, this, pos);
-    }
+    //void SendCrashPos(Vector3 pos)
+    //{
+    //    EventManager.Instance.PostNotification(EVENT_TYPE.CRASH, this, pos);
+    //}
 
     void OnDisable()
     {

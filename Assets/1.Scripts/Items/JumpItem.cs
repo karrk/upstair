@@ -31,7 +31,7 @@ public class JumpItem : MonoBehaviour, I_ItemType
         this.transform.SetParent(myParent);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (this.transform.position.y + I_ItemType.ReturnDistance <= Character.Instance.Pos.y)
         {
@@ -53,18 +53,34 @@ public class JumpItem : MonoBehaviour, I_ItemType
 
     private Stair SearchTargetStair()
     {
+        Stair targetStair = null;
+
         _currStairNum = StairCreator._stairDic[Character.Instance.CurrentStair];
 
         int targetNum = _currStairNum + _plusStairCount;
 
-        if (!StairCreator._stairDic.ContainsValue(targetNum))
-            targetNum++;
+        //if (!StairCreator._stairDic.ContainsValue(targetNum))
+        //    targetNum++;
+        // 리스트에 계단이 있어야하고, 계단이 메트로라인이 아니여야한다.
+        // 두가지 조건이 만족할때까지 1칸 위로 증가시키며 조회한다.
 
-        if (StairCreator._stairDic.FirstOrDefault(x => x.Value == targetNum).Key.TryGetComponent<Stair>(out Stair stair))
-            return stair;
+        while (true)
+        {
+            if (StairCreator._stairDic.ContainsValue(targetNum))
+            {
+                targetStair = StairCreator._stairDic.FirstOrDefault(x => x.Value == targetNum).Key.GetComponent<Stair>();
+            }
+            else
+            {
+                targetNum++;
+                continue;
+            }
 
-        else
-            return null;
+            if (targetStair.isMetroLine)
+                targetNum++;
+            else
+                return targetStair;
+        }
     }
 
 

@@ -33,34 +33,36 @@ public class GameManager : MonoBehaviour
         else
             Destroy(this.gameObject);
 
-        DOTween.Init(true, false, LogBehaviour.ErrorsOnly).SetCapacity(200, 10);
+        DOTween.Init(true, true, LogBehaviour.ErrorsOnly).SetCapacity(200, 100);
     }
 
     public void Restart()
     {
         SceneManager.LoadScene(1);
-        DOTween.KillAll(true);
-        E_reset();
     }
 
     void Start()
     {
         InitResetOptions();
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void InitResetOptions()
     {
+        E_reset += JumpPosControll.Instance.ResetOptions;
+        E_reset += MapManager.Instance.ResetOptions;
+        E_reset += BotCreator.Instance.ResetOptions;
+        E_reset += DeathManager.Instance.ResetOptions;
         E_reset += FindObjectOfType<ItemCreator>().ResetOptions;
         E_reset += Character.Instance.ResetOptions;
         E_reset += InputManager.Instance.ResetOptions;
         E_reset += ObjPool.Instance.ResetOptions;
         E_reset += CharacterControll.Instance.ResetOptions;
-        
-        E_reset += EventManager.Instance.ResetOptions;
         E_reset += RockCreator.Instance.ResetOptions;
         E_reset += CameraControll.Instance.ResetOptions;
         E_reset += Water.Instance.ResetOptions;
         E_reset += CharacterAnim.Instance.ResetOptions;
+        E_reset += ScoreManager.Instance.ResetOptions;
     }
 
     public int Score
@@ -112,5 +114,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.buildIndex == 1)
+        {
+            EventManager.Instance.ResetOptions();
+            E_reset();
+        }
+            
+    }
 }

@@ -12,14 +12,15 @@ TagManager:
   - RankBtn
   - Item
   - Button
+  - Metro
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - NoPostProcessing
   - Water
   - UI
-  - 
+  - OutLine
   - 
   - 
   - 

@@ -22,6 +22,9 @@ public class CameraControll : MonoBehaviour
     const float ShakeMinPower = 0.001f;
     float inclination;
 
+    GameObject _underWaterFilter;
+    ParticleSystem bubbleFx;
+
     void Awake()
     {
         if (_instance == null)
@@ -42,16 +45,23 @@ public class CameraControll : MonoBehaviour
 
     public Vector3 _offset;
 
+    Quaternion _initRot;
     Vector3 _initPos;
 
     void Start()
     {
         EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
+        _underWaterFilter = transform.GetChild(0).gameObject;
+        bubbleFx = transform.GetChild(1).GetComponent<ParticleSystem>(); // À§¹è
         _initPos = this.transform.position;
+        _initRot = this.transform.rotation;
     }
 
     public void ResetOptions()
     {
+        _underWaterFilter.SetActive(false);
+
+        this.transform.rotation = _initRot;
         this.transform.position = _initPos;
         EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
     }
@@ -65,7 +75,7 @@ public class CameraControll : MonoBehaviour
     {
         if (eventType == EVENT_TYPE.CAMERA_SHAKE)
         {
-            this.transform.DOShakePosition(0.3f, CalculateShakePower((float)param), 30);
+            this.transform.DOShakePosition(0.3f, CalculateShakePower((float)param), 30); 
         }
     }
 
@@ -79,21 +89,32 @@ public class CameraControll : MonoBehaviour
     {
         if (Character.Instance.IsDead)
         {
-            transform.position += new Vector3(0, 0.15f * Time.deltaTime, 0);
+            RatateDown();
             return;
         }
 
-        this.transform.DOMove(AddVector(Character.Instance.Pos), 0.5f).SetAutoKill(true);
+        this.transform.DOMove(AddVector(Character.Instance.Pos), 0.5f);
+    }
 
-        //this.transform.position = Vector3.Slerp(
-        //this.transform.position,
-        //AddVector(Character.Instance.Pos),
-        //_camSpeed
-        //);
+    void RatateDown()
+    {
+        transform.rotation = Quaternion.Slerp(transform.rotation,
+            Quaternion.Euler(50, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z),
+            2f*Time.deltaTime);
+
     }
 
     Vector3 AddVector(Vector3 offsetPos)
     {
         return new Vector3(0, offsetPos.y, offsetPos.z) + _offset;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Water"))
+        {
+            _underWaterFilter.SetActive(true);
+            bubbleFx.gameObject.SetActive(true);
+        }
     }
 }

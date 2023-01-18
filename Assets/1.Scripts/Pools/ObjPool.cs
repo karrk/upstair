@@ -35,6 +35,14 @@ public class ObjPool : MonoBehaviour
         DOUBLE,
         LEFT,
         RIGHT,
+
+        CIRCLE,
+        CIRCLE_LEFT,
+        CIRCLE_RIGHT,
+
+        LEFT_MOVE_STAIR,
+        RIGHT_MOVE_STAIR,
+        
         NONE,
     }
 
@@ -51,6 +59,13 @@ public class ObjPool : MonoBehaviour
     Stack<GameObject> _rightPool = new Stack<GameObject>();
     Stack<GameObject> _doublePool = new Stack<GameObject>();
 
+    Stack<GameObject> _circlePool = new Stack<GameObject>();
+    Stack<GameObject> _circleLeftPool = new Stack<GameObject>();
+    Stack<GameObject> _circleRightPool = new Stack<GameObject>();
+
+    Stack<GameObject> _rightMovePool = new Stack<GameObject>();
+    Stack<GameObject> _leftMovePool = new Stack<GameObject>();
+
     Stack<GameObject> _jumpItemPool = new Stack<GameObject>();
     Stack<GameObject> _superJumpItemPool = new Stack<GameObject>();
 
@@ -61,6 +76,13 @@ public class ObjPool : MonoBehaviour
     public GameObject _doubleStair;
     public GameObject _leftStair;
     public GameObject _rightStair;
+
+    public GameObject _circleStair;
+    public GameObject _circleLeftStair;
+    public GameObject _circleRightStair;
+
+    public GameObject _rightMoveStair;
+    public GameObject _leftMoveStair;
 
     [Space (10f)]
     public GameObject _jumpItem;
@@ -73,6 +95,13 @@ public class ObjPool : MonoBehaviour
     ObjectPoolType _doublePoolType;
     ObjectPoolType _leftPoolType;
     ObjectPoolType _rightPoolType;
+
+    ObjectPoolType _circlePoolType;
+    ObjectPoolType _circleLeftPoolType;
+    ObjectPoolType _circleRightPoolType;
+
+    ObjectPoolType _rightMovePoolType;
+    ObjectPoolType _leftMovePoolType;
 
     ObjectPoolType _jumpItemPoolType;
     ObjectPoolType _superJumpItemPoolType;
@@ -94,6 +123,13 @@ public class ObjPool : MonoBehaviour
         _leftPoolType = new ObjectPoolType(_leftPool, StairType.LEFT, _leftStair);
         _rightPoolType = new ObjectPoolType(_rightPool, StairType.RIGHT, _rightStair);
 
+        _circlePoolType = new ObjectPoolType(_circlePool, StairType.CIRCLE, _circleStair);
+        _circleLeftPoolType = new ObjectPoolType(_circleLeftPool, StairType.CIRCLE_LEFT, _circleLeftStair);
+        _circleRightPoolType = new ObjectPoolType(_circleRightPool, StairType.CIRCLE_RIGHT, _circleRightStair);
+        
+        _rightMovePoolType = new ObjectPoolType(_rightMovePool, StairType.RIGHT_MOVE_STAIR, _rightMoveStair);
+        _leftMovePoolType = new ObjectPoolType(_leftMovePool, StairType.LEFT_MOVE_STAIR, _leftMoveStair);
+
         _jumpItemPoolType = new ObjectPoolType(_jumpItemPool, ItemType.JUMP, _jumpItem);
         _superJumpItemPoolType = new ObjectPoolType(_superJumpItemPool, ItemType.SUPERJUMP, _superJumpItem);
 
@@ -101,6 +137,13 @@ public class ObjPool : MonoBehaviour
         _stairTypeList.Add(_doublePoolType);
         _stairTypeList.Add(_leftPoolType);
         _stairTypeList.Add(_rightPoolType);
+
+        _stairTypeList.Add(_circlePoolType);
+        _stairTypeList.Add(_circleLeftPoolType);
+        _stairTypeList.Add(_circleRightPoolType);
+
+        _stairTypeList.Add(_rightMovePoolType);
+        _stairTypeList.Add(_leftMovePoolType);
 
         _itemTypeList.Add(_jumpItemPoolType);
         _itemTypeList.Add(_superJumpItemPoolType);
@@ -154,7 +197,11 @@ public class ObjPool : MonoBehaviour
         List<ObjectPoolType> list;
 
         if (objType.Equals(StairType.SINGLE) || objType.Equals(StairType.DOUBLE)
-            || objType.Equals(StairType.LEFT) || objType.Equals(StairType.RIGHT))
+            || objType.Equals(StairType.LEFT) || objType.Equals(StairType.RIGHT)
+            || objType.Equals(StairType.CIRCLE) || objType.Equals(StairType.CIRCLE_LEFT)
+            || objType.Equals(StairType.CIRCLE_RIGHT) || objType.Equals(StairType.RIGHT_MOVE_STAIR)
+            || objType.Equals(StairType.LEFT_MOVE_STAIR)
+            )
         {
             list = _stairTypeList;
         }

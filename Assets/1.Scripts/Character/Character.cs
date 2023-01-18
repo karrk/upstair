@@ -23,6 +23,7 @@ public class Character : MonoBehaviour
     private I_ItemType _item;
 
     private Vector3 _initPos;
+    private Quaternion _initRotation;
 
     private Vector3 _pos;
 
@@ -50,9 +51,15 @@ public class Character : MonoBehaviour
     public bool IsDead
     {
         get { return _isDead; }
+        set
+        {
+            if(value == true)
+            {
+                EventManager.Instance.PostNotification(EVENT_TYPE.CHARACTER_DEAD, this);
+                _isDead = value;
+            }
+        }
     }
-
-    JumpPosControll _jumpPosControll;
 
     void Awake()
     {
@@ -68,23 +75,24 @@ public class Character : MonoBehaviour
     void Start()
     {
         _initPos = this.transform.position;
-
-        _jumpPosControll = FindObjectOfType<JumpPosControll>();
+        _initRotation = this.transform.rotation;
 
         _lastPosY = Pos.y;
 
-        E_colStair += _jumpPosControll.Move;
+        E_colStair += JumpPosControll.Instance.Move;
         E_colStair += RockCreator.Instance.Move;
-
+        E_colStair += BotCreator.Instance.Move;
+        E_colStair += ScoreManager.Instance.Move;
+        E_colStair += MetroLimitor.Instacne.Move;
+        E_colStair += MetroCreator.Instacne.CheckDistance;
     }
 
     void FixedUpdate()
     {
         _pos = transform.position;
 
-        //if(IsDead == false)
         if (_pos.y < LastPosY-0.05f)
-            _isDead = true;
+            IsDead = true;
     }
 
     public void UpdateLastPos()
@@ -102,7 +110,10 @@ public class Character : MonoBehaviour
         if (collision.gameObject.CompareTag("Stair"))
         {
             SetCurrentStair(collision.gameObject);
+            
+            EventManager.Instance.PostNotification(EVENT_TYPE.CONTACT_STAIR, this);
             E_colStair();
+
             UpdateLastPos();
         }
 
@@ -114,28 +125,40 @@ public class Character : MonoBehaviour
             }
             item.Use();
         }
+    }
 
-        if (collision.gameObject.CompareTag("Water"))
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Water"))
         {
+            IsDead = true;
+        }
 
+        if (other.gameObject.CompareTag("Metro"))
+        {
+            IsDead = true;
+            GetComponent<Rigidbody>().AddForce(new Vector3(50,0,0),ForceMode.Impulse);
         }
     }
 
     public void ResetOptions()
     {
+        GetComponent<Rigidbody>().isKinematic = true;
         this.transform.position = _initPos;
+        this.transform.rotation = _initRotation;
         _currentStair = null;
         _item = null;
         _pos = _initPos;
         UpdateLastPos();
         _isDead = false;
+        GetComponent<Rigidbody>().isKinematic = false;
     }
 
     public void CrushKill()
     {
         if (!_isDead)
         {
-            _isDead = true;
+            IsDead = true;
             GetComponent<CharacterAnim>().PlayCruchKillAnim();
         }
         

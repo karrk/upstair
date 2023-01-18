@@ -26,3 +26,22 @@ public class ObjectPoolType
         return _pool.Pop();
     }
 }
+
+public class ObjectFXType
+{
+    public Enum _eType;
+    public GameObject _prefabObj;
+    public List<GameObject> _list;
+
+    public ObjectFXType(List<GameObject> list, Enum eType, GameObject prefabObj)
+    {
+        this._list = list;
+        this._eType = eType;
+        this._prefabObj = prefabObj;
+    }
+
+    public void Add(GameObject obj)
+    {
+        _list.Add(obj);
+    }
+}

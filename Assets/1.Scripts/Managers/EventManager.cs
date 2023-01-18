@@ -6,9 +6,12 @@ public enum EVENT_TYPE
 {
     CRASH,
     GAME_INPUT_SIGN,
+    GAME_RESTART,
     CHARACTER_DEAD,
     CHARACTER_JUMP,
     CAMERA_SHAKE,
+    CONTACT_STAIR,
+    SCORE_OVER,
     SCORE_10,
     SCORE_100,
     SCORE_1000,
@@ -44,7 +47,7 @@ public class EventManager : MonoBehaviour
 
     public delegate void OnEvent(EVENT_TYPE eventType, Component sender, object Param = null);
 
-    private Dictionary<EVENT_TYPE, List<OnEvent>> _listeners
+    public Dictionary<EVENT_TYPE, List<OnEvent>> _listeners
         = new Dictionary<EVENT_TYPE, List<OnEvent>>();
 
     public void ResetOptions()

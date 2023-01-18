@@ -5,6 +5,16 @@ using DG.Tweening;
 
 public class FinishPanel : BasePanel
 {
+    protected override void Init()
+    {
+        GameManager.Instance.E_reset += ResetOptions;
+    }
+
+    void ResetOptions()
+    {
+        transform.position = _initPos;
+    }
+
     void FixedUpdate()
     {
         if (Character.Instance.IsDead)

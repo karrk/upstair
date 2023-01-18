@@ -47,11 +47,13 @@ public class Water : MonoBehaviour
     Vector3 _initPos;
 
     bool _isStart = false;
+    bool _isFin = false;
 
     public void ResetOptions()
     {
         this.transform.position = _initPos;
         _isStart = false;
+        _isFin = false;
         Init();
     }
 
@@ -64,6 +66,7 @@ public class Water : MonoBehaviour
     void Init()
     {
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
@@ -73,6 +76,11 @@ public class Water : MonoBehaviour
             if (!_isStart)
                 _isStart = true;
         }
+
+        if(eventType == EVENT_TYPE.CHARACTER_DEAD)
+        {
+            _isFin = true;
+        }
     }
 
     void FixedUpdate()
@@ -81,13 +89,17 @@ public class Water : MonoBehaviour
             return;
 
         this.transform.position =
-            new Vector3(transform.position.x,
-            transform.position.y + Speed * Time.deltaTime,
-            Character.Instance.Pos.z);
+        new Vector3(transform.position.x,
+        transform.position.y + Speed * Time.deltaTime,
+        Character.Instance.Pos.z);
+
     }
 
     float SetUpSpeed(float targetHeight) // 레벨 조정
     {
+        if (_isFin)
+            return 15f;
+
         float posY = transform.position.y;
 
         if (targetHeight <= posY + MaxDistance1)
@@ -99,5 +111,4 @@ public class Water : MonoBehaviour
         else
             return 10f;
     }
-
 }

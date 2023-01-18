@@ -60,6 +60,4 @@ public class UIManager : MonoBehaviour
         return EventSystem.current.IsPointerOverGameObject();
     }
 
-    // 버튼이 할 기능들
-    // 함수 동작 - 패널 열기, 랭킹 보기, 다시 하기, 광고 보기, 옵션 설정하기
 }
