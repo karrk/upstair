@@ -50,7 +50,7 @@ public class CharacterControll : MonoBehaviour
 
     enum JumpPos
     {
-        SINGLE,
+        UP,
         DOUBLE,
         LEFT,
         RIGHT,
@@ -76,26 +76,26 @@ public class CharacterControll : MonoBehaviour
         
     }
 
-    public void CheckJumpType(InputManager.DragType slide)
+    public void CharacterJumpAction(InputManager.InputMode mode)
     {
         if (_isJump || Character.Instance.IsDead)
             return;
 
-        switch (slide)
+        switch (mode)
         {
-            case InputManager.DragType.Single:
-                Jump(_jumpPosDic[(int)JumpPos.SINGLE].position);
+            case InputManager.InputMode.Up:
+                Jump(_jumpPosDic[(int)JumpPos.UP].position);
                 break;
 
-            case InputManager.DragType.Up:
+            case InputManager.InputMode.Double:
                 Jump(_jumpPosDic[(int)JumpPos.DOUBLE].position);
                 break;
 
-            case InputManager.DragType.Left:
+            case InputManager.InputMode.Left:
                 Jump(_jumpPosDic[(int)JumpPos.LEFT].position);
                 break;
 
-            case InputManager.DragType.Right:
+            case InputManager.InputMode.Right:
                 Jump(_jumpPosDic[(int)JumpPos.RIGHT].position);
                 break;
 

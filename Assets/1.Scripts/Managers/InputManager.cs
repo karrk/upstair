@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class InputManager : MonoBehaviour
 {
@@ -18,7 +20,7 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    public delegate void OnInput(DragType slide);
+    public delegate void OnInput(InputMode mode);
     public event OnInput DetectInput;
 
     CharacterControll characterControll;
@@ -34,23 +36,23 @@ public class InputManager : MonoBehaviour
             Destroy(this.gameObject);
     }
 
-    public enum DragType
+    public enum InputMode
     {
-        Single,
         Up,
+        Double,
         Left,
         Right,
         None,
     }
 
-    private DragType _inputType = DragType.None;
+    private InputMode _inputType = InputMode.None;
 
-    public DragType Input_Type
+    public InputMode Input_Type
     {
         get { return _inputType; }
         set
         {
-            if (value != DragType.None)
+            //if (value != InputMode.None)
                 EventManager.Instance.PostNotification(EVENT_TYPE.GAME_INPUT_SIGN, this);
             
             _inputType = value;
@@ -63,28 +65,100 @@ public class InputManager : MonoBehaviour
     Vector3 _inputStartPos;
     Vector3 _inputEndPos;
 
+    MoveBtnControll _moveBtnControll;
+
     public void ResetOptions()
     {
-        _inputType = DragType.None;
+        _inputType = InputMode.None;
         characterControll = FindObjectOfType<CharacterControll>();
     }
 
     void Start()
     {
         characterControll = FindObjectOfType<CharacterControll>();
-        
-        DetectInput += characterControll.CheckJumpType;
+        _moveBtnControll = FindObjectOfType<MoveBtnControll>();
+
+        DetectInput += characterControll.CharacterJumpAction;
+
+        EventManager.Instance.AddListener(EVENT_TYPE.MOVE_BTN, OnEvent);
+    }
+
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if(eventType == EVENT_TYPE.MOVE_BTN)
+        {
+            if ((int)Param == (int)MOVE_Dir.Left)
+                Input_Type = InputMode.Left;
+            else if((int)Param == (int)MOVE_Dir.Right)
+                Input_Type = InputMode.Right;
+            else
+                Input_Type = InputMode.Up;
+
+            DetectInput(_inputType);
+            //Input_Type = InputMode.None;
+        }
     }
 
     void Update()
     {
-        if (UIManager.Instance.IsOnUIElement)
-            return;
+        //if (UIManager.Instance.IsOnUIElement)
+        //    return;
 
-        CheckInput();
+        //#if UNITY_EDITOR_WIN
+        //        KeyInputCheck();
+
+        //#endif
+        TouchInputCheck();
+
+        //MouseInputCheck();
+
     }
 
-    void CheckInput()
+    Touch _touch;
+
+    void TouchInputCheck()
+    {
+        if(Input.touchCount > 0)
+        {
+            _touch = Input.GetTouch(0);
+
+            if(_touch.phase == TouchPhase.Began)
+            {
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
+            }
+
+            if (_touch.phase == TouchPhase.Ended)
+            {
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
+
+                EventManager.Instance.PostNotification(EVENT_TYPE.MOVE_BTN, this, MOVE_Dir.None);
+            }
+        }
+    }
+
+    void KeyInputCheck()
+    {
+        if (Input.anyKey)
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+                Input_Type = InputMode.Up;
+
+            else if (Input.GetKeyDown(KeyCode.Space))
+                Input_Type = InputMode.Double;
+
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+                Input_Type = InputMode.Right;
+
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+                Input_Type = InputMode.Left;
+
+            DetectInput(_inputType);
+        }
+    }
+
+    void MouseInputCheck()
     {
         //#if UNITY_EDITOR_WIN
 
@@ -117,16 +191,16 @@ public class InputManager : MonoBehaviour
             || Mathf.Abs(X_distance) >= DefaultSlideDistance + OptionSlideDistance)
         {
             if (Y_distance >= Mathf.Abs(X_distance))
-                Input_Type = DragType.Up;
+                Input_Type = InputMode.Up;
 
             else if (X_distance > 0)
-                Input_Type = DragType.Right;
+                Input_Type = InputMode.Right;
 
             else if (X_distance < 0)
-                Input_Type = DragType.Left;
+                Input_Type = InputMode.Left;
         }
         else
-            Input_Type = DragType.Single;
+            Input_Type = InputMode.Double;
     }
 
     float GetSlideDistance()

@@ -13,19 +13,19 @@ public class RetryBtn : BaseButton
         }
     }
 
-    public override void Init()
+    protected override void Init()
     {
         base.Init();
         IsRestart = false;
     }
 
-    public override void BtnAction()
+    protected override void BtnAction()
     {
         IsRestart = true;
         StartCoroutine(Restart());
     }
 
-    IEnumerator Restart()
+    protected IEnumerator Restart()
     {
         yield return new WaitForSeconds(1f);
         GameManager.Instance.Restart();

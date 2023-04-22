@@ -131,7 +131,7 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
         
         else
         {
-            int randStairNum = _rand.Next(1, ObjPool.Instance._stairTypeList.Count);
+            int randStairNum = _rand.Next(2, ObjPool.Instance._stairTypeList.Count);
 
             if(randStairNum == (int)ObjPool.StairType.DOUBLE)
             {

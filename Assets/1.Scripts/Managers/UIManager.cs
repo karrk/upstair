@@ -33,17 +33,15 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private bool _isOnUIElemnet;
+
     public bool IsOnUIElement
     {
         get
         {
-            return CheckUIElement();
+            CheckUIElement();
+            return _isOnUIElemnet;
         }
-    }
-
-    void Start()
-    {
-
     }
 
     void FixedUpdate()
@@ -55,9 +53,15 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    bool CheckUIElement()
+    void CheckUIElement()
     {
-        return EventSystem.current.IsPointerOverGameObject();
+        if (EventSystem.current.IsPointerOverGameObject())
+            _isOnUIElemnet = true;
+    }
+
+    public void InitOnUIProperties()
+    {
+        _isOnUIElemnet = false;
     }
 
 }

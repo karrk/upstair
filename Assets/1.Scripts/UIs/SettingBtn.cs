@@ -8,7 +8,7 @@ public class SettingBtn : BaseButton
     public GameObject _settingPanel;
     Vector3 _initPos;
 
-    public override void Init()
+    protected override void Init()
     {
         base.Init();
 
@@ -27,7 +27,6 @@ public class SettingBtn : BaseButton
             btn.interactable = true;
 
         transform.position = _initPos;
-        //EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
@@ -42,7 +41,7 @@ public class SettingBtn : BaseButton
         }
     }
 
-    public override void BtnAction()
+    protected override void BtnAction()
     {
         if (!_settingPanel.activeSelf)
             _settingPanel.SetActive(true);

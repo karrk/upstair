@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum EVENT_TYPE
 {
+    MOVE_BTN,
     CRASH,
     GAME_INPUT_SIGN,
     GAME_RESTART,
