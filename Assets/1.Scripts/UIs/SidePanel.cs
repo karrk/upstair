@@ -27,7 +27,7 @@ public class SidePanel : BasePanel
         image = GetComponent<Image>();
         image.raycastTarget = true;
 
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+        //EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
         transform.position = _initPos;
     }
 

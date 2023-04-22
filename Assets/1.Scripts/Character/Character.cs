@@ -51,14 +51,6 @@ public class Character : MonoBehaviour
     public bool IsDead
     {
         get { return _isDead; }
-        set
-        {
-            if(value == true)
-            {
-                EventManager.Instance.PostNotification(EVENT_TYPE.CHARACTER_DEAD, this);
-                _isDead = value;
-            }
-        }
     }
 
     void Awake()
@@ -87,12 +79,18 @@ public class Character : MonoBehaviour
         E_colStair += MetroCreator.Instacne.CheckDistance;
     }
 
+    void DeadLogic()
+    {
+        _isDead = true;
+        EventManager.Instance.PostNotification(EVENT_TYPE.CHARACTER_DEAD, this);
+    }
+
     void FixedUpdate()
     {
         _pos = transform.position;
 
-        if (_pos.y < LastPosY-0.05f)
-            IsDead = true;
+        if (_pos.y < LastPosY - 0.05f)
+            DeadLogic();
     }
 
     public void UpdateLastPos()
@@ -131,12 +129,12 @@ public class Character : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Water"))
         {
-            IsDead = true;
+            DeadLogic();
         }
 
         if (other.gameObject.CompareTag("Metro"))
         {
-            IsDead = true;
+            DeadLogic();
             GetComponent<Rigidbody>().AddForce(new Vector3(50,0,0),ForceMode.Impulse);
         }
     }
@@ -158,7 +156,7 @@ public class Character : MonoBehaviour
     {
         if (!_isDead)
         {
-            IsDead = true;
+            DeadLogic();
             GetComponent<CharacterAnim>().PlayCruchKillAnim();
         }
         

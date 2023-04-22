@@ -50,14 +50,14 @@ public class EventManager : MonoBehaviour
     public Dictionary<EVENT_TYPE, List<OnEvent>> _listeners
         = new Dictionary<EVENT_TYPE, List<OnEvent>>();
 
-    public void ResetOptions()
-    {
-        foreach (var item in _listeners)
-        {
-            if (!item.Value.Equals(null))
-                item.Value.RemoveRange(0, item.Value.Count);
-        }
-    }
+    //public void ResetOptions()
+    //{
+    //    foreach (var item in _listeners)
+    //    {
+    //        if (!item.Value.Equals(null))
+    //            item.Value.RemoveRange(0, item.Value.Count);
+    //    }
+    //}
 
     public void AddListener(EVENT_TYPE eventType, OnEvent listener)
     {

@@ -48,17 +48,9 @@ public class BotControll : MonoBehaviour
         }
     }
 
-    //void OnDisable()
-    //{
-    //    if(BotCreator.Instance._currentBot != null)
-    //    {
-    //        BotCreator.Instance._currentBot = null;
-    //    }
-    //}
-
     void JumpNextStair()
     {
-        transform.DOJump(GetNextStairPos(), _jumpPower, 1, 0.2f);
+        transform.DOJump(GetNextStairPos(), _jumpPower, 1, 0.2f).SetAutoKill(true);
         _isLanding = false;
         _nextStair = null;
     }

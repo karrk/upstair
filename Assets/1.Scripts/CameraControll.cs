@@ -18,6 +18,8 @@ public class CameraControll : MonoBehaviour
         }
     }
 
+    const float CamMoveTime = 0.1f;
+
     const float ShakeMaxPower = 0.3f;
     const float ShakeMinPower = 0.001f;
     float inclination;
@@ -37,7 +39,7 @@ public class CameraControll : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        inclination = -(ShakeMaxPower - ShakeMinPower) / StairCreator.DISTANCE; // ±â¿ï±â °è»ê
+        inclination = -(ShakeMaxPower - ShakeMinPower) / StairCreator.DISTANCE; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     }
 
     [Range(0.01f, 1)]
@@ -51,8 +53,10 @@ public class CameraControll : MonoBehaviour
     void Start()
     {
         EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+
         _underWaterFilter = transform.GetChild(0).gameObject;
-        bubbleFx = transform.GetChild(1).GetComponent<ParticleSystem>(); // À§¹è
+        bubbleFx = transform.GetChild(1).GetComponent<ParticleSystem>(); // ï¿½ï¿½ï¿½ï¿½
         _initPos = this.transform.position;
         _initRot = this.transform.rotation;
     }
@@ -63,7 +67,7 @@ public class CameraControll : MonoBehaviour
 
         this.transform.rotation = _initRot;
         this.transform.position = _initPos;
-        EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
+        //EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
     }
 
     void FixedUpdate()
@@ -75,7 +79,31 @@ public class CameraControll : MonoBehaviour
     {
         if (eventType == EVENT_TYPE.CAMERA_SHAKE)
         {
-            this.transform.DOShakePosition(0.3f, CalculateShakePower((float)param), 30); 
+            StartCoroutine(ShakeCam(CalculateShakePower((float)param)));
+        }
+
+        if(eventType == EVENT_TYPE.CHARACTER_DEAD)
+        {
+            RotateDown();
+        }
+    }
+
+    IEnumerator ShakeCam(float power)
+    {
+        while (true)
+        {
+            if (power <= 0)
+                break;
+
+            this.transform.position +=
+                new Vector3(Random.Range(-power, power), Random.Range(-power, power), Random.Range(-power, power));
+
+            Debug.Log(power);
+
+            power -= 0.3f;
+
+            yield return null;
+
         }
     }
 
@@ -87,16 +115,15 @@ public class CameraControll : MonoBehaviour
 
     void MoveCamera()
     {
-        if (Character.Instance.IsDead)
-        {
-            RatateDown();
-            return;
-        }
+        if(Character.Instance.IsDead)
+        return;
 
-        this.transform.DOMove(AddVector(Character.Instance.Pos), 0.5f);
+        // this.transform.DOMove(AddVector(Character.Instance.Pos), 0.5f).SetRecyclable(true);
+        this.transform.position = Vector3.Slerp
+            (this.transform.position, AddVector(Character.Instance.Pos), CamMoveTime);
     }
 
-    void RatateDown()
+    void RotateDown()
     {
         transform.rotation = Quaternion.Slerp(transform.rotation,
             Quaternion.Euler(50, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z),

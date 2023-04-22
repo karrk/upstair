@@ -7,13 +7,17 @@ public class BestCursor : MonoBehaviour
     Rigidbody _rb;
     bool _over = false;
 
+
+    private void Start()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.SCORE_OVER, OnEvent);
+    }
+
     void OnEnable()
     {
         _over = false;
         _rb = GetComponent<Rigidbody>();
         _rb.isKinematic = true;
-
-        EventManager.Instance.AddListener(EVENT_TYPE.SCORE_OVER, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType,Component component,object param = null)
@@ -38,7 +42,7 @@ public class BestCursor : MonoBehaviour
 
     IEnumerator DestroyObj()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
         Destroy(this.gameObject);
     }
 }

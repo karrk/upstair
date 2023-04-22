@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
         else
             Destroy(this.gameObject);
 
-        DOTween.Init(true, true, LogBehaviour.ErrorsOnly).SetCapacity(200, 100);
+        DOTween.Init(false, false, LogBehaviour.ErrorsOnly).SetCapacity(200, 100);
     }
 
     public void Restart()
@@ -90,11 +90,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    int nextStepNum = MaxStair / MaxLevel; // ·¹º§º° °£°Ý
+    int nextStepNum = MaxStair / MaxLevel; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     private int _level = 1;
 
-    public int Level // ¼öÁ¤
+    public int Level // ï¿½ï¿½ï¿½ï¿½
     {
         get
         {
@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour
     {
         if (scene.buildIndex == 1)
         {
-            EventManager.Instance.ResetOptions();
+            DOTween.Clear();
             E_reset();
         }
             

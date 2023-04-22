@@ -29,7 +29,7 @@ public class Rock : MonoBehaviour
 
     void Start()
     {
-        
+
         _stepGap = Random.RandomRange(5, 10);
         _duration = SetDuration();
 
@@ -52,14 +52,14 @@ public class Rock : MonoBehaviour
             Destroy(this.gameObject);
             RockCreator.RemoveRock(this);
         }
-            
+
 
         Rotate();
     }
 
     void Rotate()
     {
-        _modelTr.Rotate(new Vector3(Time.deltaTime * -(InitSpeed*_stepGap), 0, 0));
+        _modelTr.Rotate(new Vector3(Time.deltaTime * -(InitSpeed * _stepGap), 0, 0));
     }
 
     bool FindNextStair(ref int searchStairNum)
@@ -90,7 +90,7 @@ public class Rock : MonoBehaviour
         {
             _nextStair = StairCreator._stairDic.FirstOrDefault(x => x.Value == nextNum).Key;
 
-            if (_nextStair.TryGetComponent<Stair>(out Stair stair)) 
+            if (_nextStair.TryGetComponent<Stair>(out Stair stair))
             {
                 _nextStairPos = _nextStair.transform.position + stair.BasePos;
                 _waningStair.transform.position = _nextStairPos;
@@ -151,12 +151,17 @@ public class Rock : MonoBehaviour
         {
             Vector3 offset = new Vector3(0, 4, 0);
 
-            EffectManager.Instance.PlayEffect(this.transform.position+offset, EffectManager.Instance._splashFXPool);
+            EffectManager.Instance.PlayEffect(this.transform.position + offset, EffectManager.Instance._splashFXPool);
         }
     }
 
     void CamShake()
     {
+        float distance = this.transform.position.z - Character.Instance.Pos.z;
+
+        if (Character.Instance.Pos.z > this.transform.position.z)
+            distance /= 2;
+
         EventManager.Instance.PostNotification(EVENT_TYPE.CAMERA_SHAKE, this,
                 this.transform.position.z - Character.Instance.Pos.z
                 );

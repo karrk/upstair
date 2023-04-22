@@ -83,7 +83,7 @@ public class ScoreManager : MonoBehaviour
             CreateCursor();
         }
 
-        EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+        //EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
         _boardObj.transform.position = _objInitPos;
         RenewalScoreText();
     }

@@ -106,7 +106,7 @@ public class CharacterControll : MonoBehaviour
 
     public void Jump(Vector3 targetPos, float jumpPower = 0.8f, float duration = 0.16f)
     {
-        transform.DOJump(targetPos, jumpPower, 1, duration);//.SetAutoKill(false);  // 시점을잡고 Kill
+        transform.DOJump(targetPos, jumpPower, 1, duration).SetRecyclable(true);
         IsJump = true;
     }
 

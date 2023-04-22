@@ -27,7 +27,7 @@ public class SettingBtn : BaseButton
             btn.interactable = true;
 
         transform.position = _initPos;
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+        //EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
