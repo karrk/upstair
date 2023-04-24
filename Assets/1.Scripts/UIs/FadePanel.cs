@@ -53,9 +53,4 @@ public class FadePanel : BasePanel
                 break;
         }
     }
-
-    void Update()
-    {
-            
-    }
 }

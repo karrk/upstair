@@ -107,9 +107,13 @@ public class Character : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Stair"))
         {
+            Stair stair;
+
+            collision.gameObject.TryGetComponent<Stair>(out stair);
+
             SetCurrentStair(collision.gameObject);
             
-            EventManager.Instance.PostNotification(EVENT_TYPE.CONTACT_STAIR, this);
+            EventManager.Instance.PostNotification(EVENT_TYPE.CONTACT_STAIR, this, stair);
             E_colStair();
 
             UpdateLastPos();

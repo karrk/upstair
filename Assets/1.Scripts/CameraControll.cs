@@ -98,8 +98,6 @@ public class CameraControll : MonoBehaviour
             this.transform.position +=
                 new Vector3(Random.Range(-power, power), Random.Range(-power, power), Random.Range(-power, power));
 
-            Debug.Log(power);
-
             power -= 0.3f;
 
             yield return null;

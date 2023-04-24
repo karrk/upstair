@@ -30,50 +30,49 @@ public class CharacterAnim : MonoBehaviour
         }
     }
 
-    Animator anim;
-
-    public void ResetOptions()
-    {
-        Init();
-
-        
-    }
+    Animator _anim;
+    int _defaultStateHashCode = int.MinValue;
 
     void Start()
     {
-        Init();
-    }
-
-    void Init()
-    {
-        anim = GetComponentInChildren<Animator>();
-        if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
+        _anim = GetComponentInChildren<Animator>();
+        if (_anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
         {
-            anim.SetTrigger("Dead");
+            _anim.SetTrigger("Dead");
         }
-            
+
+        
+
         EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_JUMP, OnEvent);
+        //EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
     {
         if (eventType == EVENT_TYPE.CHARACTER_JUMP)
+        {
+            if(_defaultStateHashCode == int.MinValue)
+                GetDefaultStateHashValue();
+
+            _anim.Play(_defaultStateHashCode, 0, 0);
+
             PlayJumpAnim();
+        }
     }
 
     void PlayJumpAnim()
     {
-        anim.SetTrigger("Jump");
+        _anim.SetTrigger("Jump");
     }
 
     void PlayJumpItemAnim(bool value)
     {
-        anim.SetBool("JumpItem",value);
+        _anim.SetBool("JumpItem",value);
     }
 
     public void PlayCruchKillAnim()
     {
-        anim.SetTrigger("Dead");
+        _anim.SetTrigger("Dead");
     }
 
     void OnCollisionEnter(Collision collision)
@@ -86,8 +85,13 @@ public class CharacterAnim : MonoBehaviour
         {
             PlayJumpItemAnim(false);
         }
-
     }
 
+    void GetDefaultStateHashValue()
+    {
+        AnimatorStateInfo stateInfo = _anim.GetCurrentAnimatorStateInfo(0);
+
+        _defaultStateHashCode = stateInfo.fullPathHash;
+    }
 
 }

@@ -95,20 +95,27 @@ public class InputManager : MonoBehaviour
                 Input_Type = InputMode.Up;
 
             DetectInput(_inputType);
+            EventSystem.current.UpdateModules();
+
             //Input_Type = InputMode.None;
         }
     }
 
     void Update()
     {
-        //if (UIManager.Instance.IsOnUIElement)
-        //    return;
+        //TouchInputCheck();
+
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        KeyInputCheck();
 
         //#if UNITY_EDITOR_WIN
         //        KeyInputCheck();
-
+        //#else
+        //        TouchInputCheck();
         //#endif
-        TouchInputCheck();
+
 
         //MouseInputCheck();
 
@@ -122,7 +129,7 @@ public class InputManager : MonoBehaviour
         {
             _touch = Input.GetTouch(0);
 
-            if(_touch.phase == TouchPhase.Began)
+            if (_touch.phase == TouchPhase.Began)
             {
                 if (EventSystem.current.IsPointerOverGameObject())
                     return;
@@ -130,9 +137,6 @@ public class InputManager : MonoBehaviour
 
             if (_touch.phase == TouchPhase.Ended)
             {
-                if (EventSystem.current.IsPointerOverGameObject())
-                    return;
-
                 EventManager.Instance.PostNotification(EVENT_TYPE.MOVE_BTN, this, MOVE_Dir.None);
             }
         }
@@ -140,22 +144,35 @@ public class InputManager : MonoBehaviour
 
     void KeyInputCheck()
     {
-        if (Input.anyKey)
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-                Input_Type = InputMode.Up;
-
-            else if (Input.GetKeyDown(KeyCode.Space))
-                Input_Type = InputMode.Double;
-
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
-                Input_Type = InputMode.Right;
-
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-                Input_Type = InputMode.Left;
-
+            Input_Type = InputMode.Up;
             DetectInput(_inputType);
         }
+            
+
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Input_Type = InputMode.Double;
+            DetectInput(_inputType);
+        }
+            
+
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            Input_Type = InputMode.Right;
+            DetectInput(_inputType);
+        }
+            
+
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            Input_Type = InputMode.Left;
+            DetectInput(_inputType);
+        }
+            
+
+        
     }
 
     void MouseInputCheck()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -20,6 +21,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    HorizontalLayoutGroup _moveBtn_HL;
+    bool _isMoveBtnAction = false;
+    float _initMoveBtnSpacing;
+    const float _setMoveBtnSpacing = -1830f;
+
     void Awake()
     {
         if (_instance == null)
@@ -33,14 +39,29 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private bool _isOnUIElemnet;
-
-    public bool IsOnUIElement
+    private void Start()
     {
-        get
+        _moveBtn_HL = FindObjectOfType<MoveBtnControll>().GetComponent<HorizontalLayoutGroup>();
+        _initMoveBtnSpacing = _moveBtn_HL.spacing;
+
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+    }
+
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if(eventType == EVENT_TYPE.GAME_INPUT_SIGN)
         {
-            CheckUIElement();
-            return _isOnUIElemnet;
+            if (!_isMoveBtnAction && !Character.Instance.IsDead)
+            {
+                StartCoroutine(MoveBtnAction());
+            }
+        }
+
+        if(eventType == EVENT_TYPE.CHARACTER_DEAD)
+        {
+            _moveBtn_HL.spacing = _initMoveBtnSpacing;
+            _isMoveBtnAction = false;
         }
     }
 
@@ -53,15 +74,20 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void CheckUIElement()
+    IEnumerator MoveBtnAction()
     {
-        if (EventSystem.current.IsPointerOverGameObject())
-            _isOnUIElemnet = true;
-    }
+        while (true)
+        {
+            if (_moveBtn_HL.spacing <= _setMoveBtnSpacing)
+                break;
 
-    public void InitOnUIProperties()
-    {
-        _isOnUIElemnet = false;
+            _moveBtn_HL.spacing -= 200f;
+
+            yield return null;
+        }
+
+        _moveBtn_HL.spacing = _setMoveBtnSpacing;
+        _isMoveBtnAction = true;
     }
 
 }

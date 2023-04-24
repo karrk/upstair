@@ -2,6 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+enum StairType
+{
+    Single = 0,
+    Double = 1,
+    Left = 2,
+    Right = 3,
+
+    Circle = 4,
+    CircleLeft = 5,
+    CircleRight = 6,
+
+    RightMove = 7,
+    LeftMove = 8,
+}
+
 public class StairCreator : MonoBehaviour, IDistanceInfo
 {
     public static float DISTANCE = 100f;
@@ -10,7 +25,6 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
     const float MinPercent = 0.1f;
 
     private int _stairNumber = 1;
-    System.Random _rand;
 
     public static Dictionary<GameObject, int> _stairDic = new Dictionary<GameObject, int>();
     public static List<GameObject> _stairList = new List<GameObject>();
@@ -31,8 +45,24 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
 
     Vector3 _initPos;
 
+    int _createRangeNum;
+
+    const float _firstCircleUnlockProgress = 0.05f;
+    const float _secondCircleUnlockProgress = 0.2f;
+    const float _moveUnlockProgress = 0.5f;
+    
+    bool _firstCircleStairUnlock = false;
+    bool _secondCircleStairUnlock = false;
+    bool _moveStairUnlock = false;
+
+    int _startStairCount = 5;
+
     public void ResetOptions()
     {
+        _startStairCount = 5;
+
+        _createRangeNum = (int)StairType.Right;
+
         _stairNumber = 1;
 
         this.transform.position = _initPos;
@@ -52,27 +82,60 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
         _stairDic = new Dictionary<GameObject, int>();
     }
 
+    void SetCreateRange()
+    {
+        float progress = (float)GameManager.Instance.Level / (float)GameManager.Instance.MaxLevel;
+
+        if (!_firstCircleStairUnlock && progress > _firstCircleUnlockProgress)
+        {
+            _firstCircleStairUnlock = true;
+            _createRangeNum = (int)StairType.Circle;
+        }
+
+        else if (!_secondCircleStairUnlock && progress > _secondCircleUnlockProgress)
+        {
+            _firstCircleStairUnlock = true;
+            _createRangeNum = (int)StairType.CircleRight;
+        }
+
+        else if (!_moveStairUnlock && progress > _moveUnlockProgress)
+        {
+            _moveStairUnlock = true;
+            _createRangeNum = (int)StairType.RightMove;
+        }
+            
+    }
+
     void Start()
     {
-        _initPos = this.transform.position;
+        _startStairCount = 5;
 
-        _rand = new System.Random(System.Guid.NewGuid().GetHashCode());
+        _createRangeNum = (int)StairType.Right;
+
+        _initPos = this.transform.position;
 
         _spawnPos = StartCreatePos;
 
         InitGenerationPercent();
         GameManager.Instance.E_reset += ResetOptions;
+
+        EventManager.Instance.AddListener(EVENT_TYPE.LEVEL_CHANGED, OnEvent);
     }
 
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if (eventType == EVENT_TYPE.LEVEL_CHANGED)
+            SetCreateRange();
+    }
 
     void InitGenerationPercent()
     {
         float percentGap = StartPercent - MinPercent;
-        float interval = percentGap / GameManager.Instance.TotalQuater;
+        float interval = percentGap / GameManager.Instance.MaxLevel;
 
         float percent = StartPercent;
 
-        for (int i = 1; i <= GameManager.Instance.TotalQuater; i++)
+        for (int i = 0; i <= GameManager.Instance.MaxLevel; i++)
         {
             percent = StartPercent - (interval * i);
 
@@ -80,6 +143,7 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
                 percent = MinPercent;
 
             _percentList.Add(percent);
+
         }
     }
 
@@ -88,7 +152,7 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
         if (isNearby(DISTANCE))
         {
             GameObject newStair =
-                ObjPool.Instance.GetObj<IStairType>(GetRandomStair());
+                ObjPool.Instance.GetObj<IStairType>(SetRandomStair());
 
             newStair.name = (_stairNumber++).ToString();
 
@@ -101,21 +165,21 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
                 _stairDic.Add(newStair, int.Parse(newStair.name));
                 _stairList.Add(newStair);
             }
-                
+
             _spawnPos += new Vector3(0, 1, 1);
         }
     }
 
     public bool isNearby(float specDistance)
     {
-        return specDistance >= PlayerDistance; 
+        return specDistance >= PlayerDistance;
     }
 
-    ObjectPoolType GetRandomStair()
+    ObjectPoolType SetRandomStair()
     {
         ObjectPoolType stairType = null;
 
-        float selectPercent = _percentList[GameManager.Instance.CurrentQuater];
+        float selectPercent = _percentList[GameManager.Instance.Level];
 
         stairType = SelectStair(selectPercent);
 
@@ -124,16 +188,22 @@ public class StairCreator : MonoBehaviour, IDistanceInfo
 
     ObjectPoolType SelectStair(float percent)
     {
-        float randNum = (float)_rand.NextDouble();
-
-        if (percent > randNum)
+        if (_startStairCount > 0)
+        {
+            _startStairCount--;
             return ObjPool.Instance._stairTypeList[(int)ObjPool.StairType.SINGLE];
-        
+        }
+
+            float randNum = Random.Range(0f, 1f);
+
+        if (percent > randNum) // 0.7 > randNum
+            return ObjPool.Instance._stairTypeList[(int)ObjPool.StairType.SINGLE];
+
         else
         {
-            int randStairNum = _rand.Next(2, ObjPool.Instance._stairTypeList.Count);
+            int randStairNum = Random.Range((int)StairType.Left, _createRangeNum+1);
 
-            if(randStairNum == (int)ObjPool.StairType.DOUBLE)
+            if (randStairNum == (int)ObjPool.StairType.DOUBLE)
             {
                 _spawnPos += new Vector3(0, 1, 1);
                 _stairNumber++;

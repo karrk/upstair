@@ -67,7 +67,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 256
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -119,6 +119,18 @@ TextureImporter:
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -308,13 +320,13 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       Option_UI_0: 1423511700
-      Option_UI_7: 1787181157
-      Option_UI_4: -2040260450
-      Option_UI_6: 703087936
-      Option_UI_5: -637550722
       Option_UI_1: 2089371837
-      Option_UI_3: -1348743092
       Option_UI_2: 1631842031
+      Option_UI_3: -1348743092
+      Option_UI_4: -2040260450
+      Option_UI_5: -637550722
+      Option_UI_6: 703087936
+      Option_UI_7: 1787181157
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 1

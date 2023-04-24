@@ -149,7 +149,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - iPhone
+    - Android
   - serializedVersion: 2
     name: Very High
     pixelLightCount: 3
@@ -185,7 +187,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   - serializedVersion: 2
     name: Ultra
     pixelLightCount: 4
@@ -221,7 +225,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 11400000, guid: 1c2e61f1887b2dc4283395c6756dd4c9, type: 2}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   m_PerPlatformDefaultQuality:
     Android: 2
     Lumin: 5

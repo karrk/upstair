@@ -111,11 +111,6 @@ public class ObjPool : MonoBehaviour
     public List<ObjectPoolType> _stairTypeList = new List<ObjectPoolType>();
     public List<ObjectPoolType> _itemTypeList = new List<ObjectPoolType>();
 
-    public void ResetOptions()
-    {
-
-    }
-
     void Start()
     {
         _singlePoolType = new ObjectPoolType(_singlePool, StairType.SINGLE, _singleStair);
@@ -177,7 +172,7 @@ public class ObjPool : MonoBehaviour
     public GameObject GetObj<T>(ObjectPoolType poolType) where T:IPoolingType
     {
         GameObject obj;
-
+        
         if (poolType._pool.Count > 0)
         {
             obj = poolType.Pop();

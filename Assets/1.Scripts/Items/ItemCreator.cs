@@ -40,18 +40,17 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
         _spawnPos = StartCreatePos;
         _rand = new System.Random(System.Guid.NewGuid().GetHashCode());
 
-        //GameManager.Instance.E_reset += ResetOptions;
         InitGenerationPercent();
     }
 
     void InitGenerationPercent()
     {
         float percentGap = StartPercent - MinPercent;
-        float interval = percentGap / GameManager.Instance.TotalQuater;
+        float interval = percentGap / GameManager.Instance.MaxLevel;
 
         float percent = StartPercent;
 
-        for (int i = 1; i <= GameManager.Instance.TotalQuater; i++)
+        for (int i = 0; i <= GameManager.Instance.MaxLevel; i++)
         {
             percent = StartPercent - (interval * i);
 
@@ -70,7 +69,7 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
 
             if (CheckCreatePercent(randNum)) 
             {
-                ObjPool.Instance.GetObj<I_ItemType>(GetRandomItem());
+                ObjPool.Instance.GetObj<I_ItemType>(SetRandomItem());
                 _spawnPos = SetRandomPos(_spawnPos);
             }
 
@@ -87,12 +86,12 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
 
     float GetCreatePercent()
     {
-        float selectPercent = _percentList[GameManager.Instance.CurrentQuater];
+        float selectPercent = _percentList[GameManager.Instance.Level];
 
         return selectPercent;
     }
 
-    ObjectPoolType GetRandomItem()
+    ObjectPoolType SetRandomItem()
     {
         float randNum = (float)_rand.NextDouble();
 

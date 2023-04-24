@@ -104,7 +104,7 @@ public class CharacterControll : MonoBehaviour
         }
     }
 
-    public void Jump(Vector3 targetPos, float jumpPower = 0.8f, float duration = 0.16f)
+    public void Jump(Vector3 targetPos, float jumpPower = 0.8f, float duration = 0.05f)
     {
         transform.DOJump(targetPos, jumpPower, 1, duration).SetRecyclable(true);
         IsJump = true;

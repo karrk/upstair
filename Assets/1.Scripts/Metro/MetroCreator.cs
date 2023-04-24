@@ -58,9 +58,9 @@ public class MetroCreator : MonoBehaviour
     void InitGenerationPercent()
     {
         float percentTotalGap = HighCreatePercent - LowCreatePercent;
-        float interval = percentTotalGap / (GameManager.Instance.TotalQuater-1);
+        float interval = percentTotalGap / (GameManager.Instance.MaxLevel);
 
-        for (int i = 0; i < GameManager.Instance.TotalQuater; i++)
+        for (int i = 0; i < GameManager.Instance.MaxLevel; i++)
         {
             float percent = LowCreatePercent + (interval * i);
 
@@ -100,7 +100,7 @@ public class MetroCreator : MonoBehaviour
     bool CheckCreatePercent() // 현재 분기에 맞는 퍼센트
     {
         float percent = Random.Range(0, 1.01f);
-        return percent < _percentList[GameManager.Instance.CurrentQuater];
+        return percent < _percentList[GameManager.Instance.Level];
     }
 
     void MetroLineCreate()

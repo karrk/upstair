@@ -14,8 +14,7 @@ public enum EVENT_TYPE
     CONTACT_STAIR,
     SCORE_OVER,
     SCORE_10,
-    SCORE_100,
-    SCORE_1000,
+    LEVEL_CHANGED,
 }
 
 public class EventManager : MonoBehaviour

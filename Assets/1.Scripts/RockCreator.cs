@@ -69,11 +69,11 @@ public class RockCreator : MonoBehaviour
     void InitGenerationTimes()
     {
         float totalGap = StartFirstTime - MinimumTime;
-        float interval = totalGap / GameManager.Instance.TotalQuater;
+        float interval = totalGap / GameManager.Instance.MaxLevel;
 
         float time = StartFirstTime;
 
-        for (int i = 0; i < GameManager.Instance.TotalQuater; i++)
+        for (int i = 0; i < GameManager.Instance.MaxLevel; i++)
         {
             time = StartFirstTime - (interval * i);
 
@@ -86,7 +86,7 @@ public class RockCreator : MonoBehaviour
 
     float GetRandomTime()
     {
-        float selectMinTime = _timeList[GameManager.Instance.CurrentQuater];
+        float selectMinTime = _timeList[GameManager.Instance.Level];
 
         return Random.Range(selectMinTime, MaximumTime);
     }
