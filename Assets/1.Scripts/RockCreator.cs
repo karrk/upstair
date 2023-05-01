@@ -19,30 +19,21 @@ public class RockCreator : MonoBehaviour
 
     public GameObject _rockPrefab;
 
-    public static List<Rock> _rockList;
-
-    const float MaximumTime = 15f;
-    const float StartFirstTime = 13f;
+    const float MaximumTime = 40f;
     const float MinimumTime = 5f;
 
-    //const float MaximumTime = 5f;
-    //const float StartFirstTime = 2f;
-    //const float MinimumTime = 1f;
-
     List<float> _timeList = new List<float>();
-    /*
-     * 일정한 시간대로 생성되는것을 방지하기위해 범위로 지정한다.
-     * 아무리 늦어도 최대시간 max초를 넘지 않게하며
-     * 분기(레벨)가 지날수록 min초가 줄어들게 만든다.
-     * 
-     * 이때 시작 1분기시간은 StartFirst시간으로 정의한다.
-     * (min초~max초)
-     */
-
+    
     Vector3 InitCreateOffsetPos = new Vector3(0, 90, 90);
     Vector3 _createOffsetPos;
 
-    float _timer;
+    const float CreateRandomOffsetTime = 10f; // -10 , 10 만큼의 오차시간발생
+    float _rockCreateProgress;
+    bool _rockCreating;
+    bool _isCoroutineRunning;
+
+    int _timeIdx;
+
 
     void Awake()
     {
@@ -60,81 +51,107 @@ public class RockCreator : MonoBehaviour
     void Start()
     {
         _createOffsetPos = InitCreateOffsetPos;
-        InitGenerationTimes();
-        _timer = MaximumTime;
+        _timeList = InitGenerationTimes();
+        _rockCreateProgress = 0f;
+        _rockCreating = false;
+        _isCoroutineRunning = false;
+        _timeIdx = 0;
 
-        _rockList = new List<Rock>();
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.LEVEL_CHANGED, OnEvent);
     }
 
-    void InitGenerationTimes()
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
-        float totalGap = StartFirstTime - MinimumTime;
-        float interval = totalGap / GameManager.Instance.MaxLevel;
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            _createOffsetPos = InitCreateOffsetPos;
+            _rockCreating = false;
+            _isCoroutineRunning = false;
+            _timeIdx = 0;
+        }
 
-        float time = StartFirstTime;
+        if(eventType == EVENT_TYPE.LEVEL_CHANGED)
+        {
+            _timeIdx = (int)Param;
+        }
+
+        if(eventType == EVENT_TYPE.CONTACT_STAIR)
+        {
+            _createOffsetPos += MovedDistance();
+
+            if (_rockCreating)
+                return;
+
+            if(_rockCreateProgress <= GameManager.Instance.GameProgress)
+            {
+                _isCoroutineRunning = true;
+                _rockCreating = true;
+
+                GetRock();
+            }
+        }
+    }
+
+    IEnumerator SetRockCreateTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        GetRock();
+    }
+
+    void GetRock()
+    {
+        if (Character.Instance.IsDead || !_isCoroutineRunning)
+            return;
+
+        GameObject rock = Instantiate(_rockPrefab,
+                this.transform.position + _createOffsetPos,
+                Quaternion.identity
+                );
+
+        float time = GetTime(_timeIdx);
+
+        StartCoroutine(SetRockCreateTime(time));
+    }
+
+    float GetTime(int idx)
+    {
+        float tempTime = _timeList[idx];
+        tempTime += Random.Range(-CreateRandomOffsetTime, CreateRandomOffsetTime);
+
+        if (tempTime < MinimumTime)
+            return MinimumTime;
+
+        return tempTime;
+    }
+
+    List<float> InitGenerationTimes()
+    {
+        List<float> times = new List<float>();
+
+        float totalGap = MaximumTime - MinimumTime;
+        float interval = totalGap / GameManager.Instance.MaxLevel+1;
+
+        float time = MaximumTime;
 
         for (int i = 0; i < GameManager.Instance.MaxLevel; i++)
         {
-            time = StartFirstTime - (interval * i);
+            time = MaximumTime - (interval * i);
 
             if (time < MinimumTime)
                 time = MinimumTime;
 
-            _timeList.Add(time);
+            times.Add(time);
         }
+
+        return times;
     }
 
-    float GetRandomTime()
+    Vector3 MovedDistance()
     {
-        float selectMinTime = _timeList[GameManager.Instance.Level];
-
-        return Random.Range(selectMinTime, MaximumTime);
-    }
-
-    public void ResetOptions()
-    {
-        _createOffsetPos = InitCreateOffsetPos;
-        RockClear();
-        _timer = MaximumTime;
-    }
-
-    void RockClear()
-    {
-        _rockList = new List<Rock>();
-    }
-
-    public static void AddRock(Rock rockObj)
-    {
-        _rockList.Add(rockObj);
-    }
-
-    public static void RemoveRock(Rock rockObj)
-    {
-        _rockList.Remove(rockObj);
-    }
-
-    void FixedUpdate()
-    {
-        if (Character.Instance.IsDead)
-            return;
-
-        if(_timer > 0)
-        {
-            _timer -= Time.deltaTime;
-        }
-        else
-        {
-            Instantiate(_rockPrefab,
-                this.transform.position + _createOffsetPos,
-                Quaternion.identity
-                );
-            _timer = GetRandomTime();
-        }
-    }
-
-    public void Move()
-    {
-        _createOffsetPos += new Vector3(0, CheckDistance(), CheckDistance());
+        return new Vector3(0, CheckDistance(), CheckDistance());
     }
 
     int CheckDistance()

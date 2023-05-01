@@ -49,24 +49,13 @@ public class Water : MonoBehaviour
     bool _isStart = false;
     bool _isFin = false;
 
-    public void ResetOptions()
-    {
-        this.transform.position = _initPos;
-        _isStart = false;
-        _isFin = false;
-        Init();
-    }
-
     void Start()
     {
         _initPos = this.transform.position;
-        Init();
-    }
-
-    void Init()
-    {
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
-        EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.DEAD_ANIM_FIN, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTINUE, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
@@ -77,10 +66,42 @@ public class Water : MonoBehaviour
                 _isStart = true;
         }
 
-        if(eventType == EVENT_TYPE.CHARACTER_DEAD)
+        if(eventType == EVENT_TYPE.DEAD_ANIM_FIN)
         {
             _isFin = true;
         }
+
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            
+            this.transform.position = _initPos;
+            _isStart = false;
+            _isFin = false;
+            GetComponent<BoxCollider>().enabled = true;
+        }
+
+        if(eventType == EVENT_TYPE.CONTINUE)
+        {
+            _isStart = false;
+            _isFin = false;
+            this.transform.position = SetRetryPos();
+            GetComponent<BoxCollider>().enabled = true;
+        }
+
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject == Camera.main.gameObject)
+            GetComponent<BoxCollider>().enabled = false;
+    }
+
+    Vector3 SetRetryPos()
+    {
+        float height = Character.Instance.Pos.y - 5f;
+
+        return new Vector3(this.transform.position.x,
+            height, height);
     }
 
     void FixedUpdate()
@@ -92,7 +113,6 @@ public class Water : MonoBehaviour
         new Vector3(transform.position.x,
         transform.position.y + Speed * Time.deltaTime,
         Character.Instance.Pos.z);
-
     }
 
     float SetUpSpeed(float targetHeight) // 레벨 조정

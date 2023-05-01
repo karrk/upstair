@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
+using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -31,125 +32,84 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    const string BESTSCORETEXT = "MyBestScore";
+    const string BESTSCORECODE = "MyBestScore";
 
     int _currentScore = 0;
-    int _bestScore;
 
-    public GameObject _bestCursor;
+    public int Score
+    {
+        get { return _currentScore; }
+    }
 
-    TMPro.TextMeshProUGUI _currentscoreText;
-    public TMPro.TextMeshProUGUI _scoreText;
-    public TMPro.TextMeshProUGUI _bestScoreText;
-    StringBuilder _sb;
+    int _bestScore = 0;
 
-    GameObject _boardObj;
-    Vector3 _objInitPos;
+    public int BestScore
+    {
+        get { return _bestScore; }
+    }
+
+    TextMeshProUGUI _finScoreText;
+    TextMeshProUGUI _bestScoreText;
 
     void Start()
     {
-        if (PlayerPrefs.HasKey(BESTSCORETEXT))
-        {
-            _bestScore = PlayerPrefs.GetInt(BESTSCORETEXT);
-            CreateCursor();
-        }
+        _bestScoreText = FindObjectOfType<FinishPanel>().transform.Find("BestScoreText").GetComponent<TextMeshProUGUI>();
+        _finScoreText = FindObjectOfType<FinishPanel>().transform.Find("FinScoreText").GetComponent<TextMeshProUGUI>();
 
-        _boardObj = transform.GetChild(0).gameObject;
-        _objInitPos = _boardObj.transform.position;
-
-        _currentscoreText = GetComponentInChildren<TMPro.TextMeshProUGUI>();
-        _sb = new StringBuilder();
-
-        RenewalScoreText();
+        LoadBestScore();
 
         EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType,Component component,object param = null)
     {
         if(eventType == EVENT_TYPE.CHARACTER_DEAD)
         {
-            RenewalBestScore();
+            if(_currentScore > _bestScore)
+            {
+                _bestScore = _currentScore;
+                PlayerPrefs.SetInt(BESTSCORECODE, _bestScore);
+            }
 
-            _scoreText.text = $"{_currentscoreText.text}Ãþ";
+            _finScoreText.text = $"{_currentScore.ToString()}Ãþ";
             _bestScoreText.text = $"ÃÖ°í°è´Ü {_bestScore.ToString()}Ãþ";
         }
-    }
 
-    public void ResetOptions()
-    {
-        if (PlayerPrefs.HasKey(BESTSCORETEXT))
+        if(eventType == EVENT_TYPE.CONTACT_STAIR)
         {
-            CreateCursor();
+            if ((Stair)param != null)
+            {
+                Stair stair = (Stair)param;
+                _currentScore = int.Parse(stair.name);
+            }
+
+            if (_currentScore > _bestScore)
+                EventManager.Instance.PostNotification(EVENT_TYPE.SCORE_OVER, this);
         }
 
-        //EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
-        _boardObj.transform.position = _objInitPos;
-        RenewalScoreText();
-    }
-
-    void CreateCursor()
-    {
-        int value = PlayerPrefs.GetInt(BESTSCORETEXT);
-
-        float tempPos_X = -4.5f;
-        Vector3 pos = new Vector3(tempPos_X, value+1, value+2f);
-
-        GameObject cursor = Instantiate(_bestCursor);
-        cursor.transform.position = pos;
-    }
-
-    IEnumerator textAnim(TMPro.TextMeshProUGUI targetText,float initSize,float maxSize)
-    {
-        targetText.fontSize = maxSize;
-
-        while (true)
+        if(eventType == EVENT_TYPE.GAME_RESTART)
         {
-            if (initSize >= targetText.fontSize)
-                break;
-
-            targetText.fontSize -= 0.2f;
-
-            yield return null;
-        }
-
-        targetText.fontSize = initSize;
-    }
-
-    public void RenewalScoreText()
-    {
-        _currentScore = GameManager.Instance.Score;
-
-        if (_currentScore > _bestScore)
-        {
-            EventManager.Instance.PostNotification(EVENT_TYPE.SCORE_OVER, this);
-        }
-            
-
-        _sb.Clear();
-        _sb.Append(_currentScore);
-
-        _currentscoreText.text = _sb.ToString();
-    }
-
-    void RenewalBestScore()
-    {
-        if (_bestScore < _currentScore)
-        {
-            _bestScore = _currentScore;
-            PlayerPrefs.SetInt(BESTSCORETEXT, _bestScore);
+            _finScoreText.text = 0.ToString();
+            LoadBestScore();
         }
     }
 
-    int CheckDistance()
+    void LoadBestScore()
     {
-        return (int)(Mathf.RoundToInt(Character.Instance.Pos.y) - (Character.Instance.LastPosY));
+        if (PlayerPrefs.HasKey(BESTSCORECODE))
+        {
+            _bestScore = PlayerPrefs.GetInt(BESTSCORECODE);
+        }
     }
 
-    public void Move()
+    private void Update()
     {
-        _boardObj.transform.position += new Vector3(0, CheckDistance(), CheckDistance());
-        RenewalScoreText();
-        StartCoroutine(textAnim(_currentscoreText, 0.8f, 1.5f));
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            PlayerPrefs.DeleteKey(BESTSCORECODE);
+        }
     }
+
 }

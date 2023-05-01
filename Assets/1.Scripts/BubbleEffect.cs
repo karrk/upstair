@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,13 +7,11 @@ public class BubbleEffect : MonoBehaviour
 {
     void Start()
     {
-        GameManager.Instance.E_reset += ResetOptions;
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
     }
 
-    void ResetOptions()
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
         this.gameObject.SetActive(false);
     }
-
-
 }

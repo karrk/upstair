@@ -10,8 +10,8 @@ public class Rock : MonoBehaviour
 
     Transform _modelTr;
 
-    GameObject _currentStair;
-    GameObject _nextStair;
+    GameObject _currentContactStair;
+    Stair _nextStair;
     Vector3 _nextStairPos;
 
     bool _isCrash;
@@ -29,7 +29,6 @@ public class Rock : MonoBehaviour
 
     void Start()
     {
-
         _stepGap = Random.RandomRange(5, 10);
         _duration = SetDuration();
 
@@ -39,8 +38,6 @@ public class Rock : MonoBehaviour
 
         _waningStair = transform.GetChild(1).gameObject;
         _waningStair.transform.SetParent(null);
-
-        RockCreator.AddRock(this);
     }
 
     void FixedUpdate()
@@ -50,7 +47,6 @@ public class Rock : MonoBehaviour
         else
         {
             Destroy(this.gameObject);
-            RockCreator.RemoveRock(this);
         }
 
 
@@ -62,44 +58,32 @@ public class Rock : MonoBehaviour
         _modelTr.Rotate(new Vector3(Time.deltaTime * -(InitSpeed * _stepGap), 0, 0));
     }
 
-    bool FindNextStair(ref int searchStairNum)
+    int FindNextStairNum(int stairNum)
     {
-        if (!StairCreator._stairDic.ContainsValue(searchStairNum))
-            searchStairNum--;
+        stairNum -= _stepGap;
 
-        return StairCreator._stairDic.ContainsValue(searchStairNum);
+        while (true)
+        {
+            if (stairNum <= 0)
+                return -1;
+
+            if (StairCreator._dic.ContainsKey(stairNum))
+                return stairNum;
+
+            stairNum--;
+        }
     }
-
-    float SetDuration()
-    {
-        float duration = (-0.1f * _stepGap) + 2;
-        return duration;
-    }
-
 
     void MoveToNextStair()
     {
         if (_isCrash)
             return;
 
-        int idx = StairCreator._stairDic[_currentStair];
+        int idx = int.Parse(_currentContactStair.name);
 
-        int nextNum = idx - _stepGap;
+        int nextStairNum = FindNextStairNum(idx);
 
-        if (FindNextStair(ref nextNum))
-        {
-            _nextStair = StairCreator._stairDic.FirstOrDefault(x => x.Value == nextNum).Key;
-
-            if (_nextStair.TryGetComponent<Stair>(out Stair stair))
-            {
-                _nextStairPos = _nextStair.transform.position + stair.BasePos;
-                _waningStair.transform.position = _nextStairPos;
-                transform.DOJump(_nextStairPos, 7, 1, _duration);
-                StartCoroutine(SetFalseCollider());
-            }
-        }
-
-        else
+        if(nextStairNum < 0)
         {
             Destroy(_waningStair);
 
@@ -112,10 +96,23 @@ public class Rock : MonoBehaviour
             transform.DOJump(offSet, 10, 1, 1.5f).OnComplete(() =>
             {
                 Destroy(this.gameObject);
-
-                RockCreator.RemoveRock(this);
             });
+
+            return;
         }
+
+        _nextStair = StairCreator._dic[nextStairNum].GetComponent<Stair>();
+
+        _nextStairPos = _nextStair.transform.position + _nextStair.BasePos;
+        _waningStair.transform.position = _nextStairPos;
+        transform.DOJump(_nextStairPos, 7, 1, _duration);
+        StartCoroutine(SetFalseCollider());
+    }
+
+    float SetDuration()
+    {
+        float duration = (-0.1f * _stepGap) + 2;
+        return duration;
     }
 
     IEnumerator SetFalseCollider()
@@ -131,7 +128,7 @@ public class Rock : MonoBehaviour
             if (_startCollider != null)
                 Destroy(_startCollider);
 
-            _currentStair = other.gameObject;
+            _currentContactStair = other.gameObject;
             MoveToNextStair();
             _isCrash = true;
             _missingTimer = 1.6f;
@@ -166,11 +163,6 @@ public class Rock : MonoBehaviour
                 this.transform.position.z - Character.Instance.Pos.z
                 );
     }
-
-    //void SendCrashPos(Vector3 pos)
-    //{
-    //    EventManager.Instance.PostNotification(EVENT_TYPE.CRASH, this, pos);
-    //}
 
     void OnDisable()
     {

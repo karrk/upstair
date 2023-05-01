@@ -8,6 +8,7 @@ public class ObjectPoolType
     public Enum _eType;
     public GameObject _prefabObj;
     public Stack<GameObject> _pool;
+    public int _poolCount;
 
     public ObjectPoolType(Stack<GameObject> pool, Enum eType, GameObject prefabObj)
     {

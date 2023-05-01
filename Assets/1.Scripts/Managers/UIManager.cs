@@ -22,9 +22,23 @@ public class UIManager : MonoBehaviour
     }
 
     HorizontalLayoutGroup _moveBtn_HL;
+    
     bool _isMoveBtnAction = false;
     float _initMoveBtnSpacing;
     const float _setMoveBtnSpacing = -1830f;
+
+    private Transform _mainCanvas;
+
+    public Transform MainCanvas
+    {
+        get
+        {
+            if (_mainCanvas == null)
+                _mainCanvas = CanvasControll.Instance.transform;
+
+            return _mainCanvas;
+        }
+    }
 
     void Awake()
     {
@@ -41,11 +55,12 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        _moveBtn_HL = FindObjectOfType<MoveBtnControll>().GetComponent<HorizontalLayoutGroup>();
+        _moveBtn_HL = MainCanvas.GetComponentInChildren<MoveBtnControll>().GetComponent<HorizontalLayoutGroup>();
         _initMoveBtnSpacing = _moveBtn_HL.spacing;
 
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_INPUT_SIGN, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTINUE, OnEvent);
     }
 
     private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
@@ -56,6 +71,11 @@ public class UIManager : MonoBehaviour
             {
                 StartCoroutine(MoveBtnAction());
             }
+        }
+
+        if(eventType == EVENT_TYPE.CONTINUE)
+        {
+            StartCoroutine(MoveBtnAction());
         }
 
         if(eventType == EVENT_TYPE.CHARACTER_DEAD)

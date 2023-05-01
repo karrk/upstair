@@ -20,22 +20,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public delegate void Reset();
-
-    public event Reset E_reset;
-
     [Range(0.1f, 1f)]
     public float _gameSpeed = 1f;
     float _setSpeed = 1f;
-
-    private void FixedUpdate()
-    {
-        if(_gameSpeed != _setSpeed)
-        {
-            Time.timeScale = _gameSpeed;
-            _setSpeed = _gameSpeed;
-        }
-    }
 
     void Awake()
     {
@@ -48,18 +35,8 @@ public class GameManager : MonoBehaviour
             Destroy(this.gameObject);
 
         DOTween.Init(false, false, LogBehaviour.ErrorsOnly).SetCapacity(200, 100);
-        Application.targetFrameRate = 100;
+        Application.targetFrameRate = 60;
         Screen.SetResolution(720, 1280, true);
-    }
-
-    int _score = 0;
-
-    public int Score
-    {
-        get
-        {
-            return _score;
-        }
     }
 
     const int _maxStair = 1000; // 테스트모드
@@ -80,53 +57,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void Restart()
+    float _gameProgress = 0;
+
+    public float GameProgress
     {
-        SceneManager.LoadScene(1);
+        get { return _gameProgress; }
     }
 
     void Start()
     {
-        InitResetOptions();
         SceneManager.sceneLoaded += OnSceneLoaded;
+
         EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
     }
+
+    private void FixedUpdate()
+    {
+        if (_gameSpeed != _setSpeed)
+        {
+            Time.timeScale = _gameSpeed;
+            _setSpeed = _gameSpeed;
+        }
+    } // 테스트용
+
 
     private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
         if(eventType == EVENT_TYPE.CONTACT_STAIR)
         {
-            if((Stair)Param != null)
-            {
-                Stair stair = (Stair)Param;
-                _score = int.Parse(stair.name);
-            }
-
-            if(_nextStairNum < _score)
+            if(_nextStairNum < ScoreManager.Instance.Score)
             {
                 _nextStairNum += _nextGapCount;
                 _level++;
-                EventManager.Instance.PostNotification(EVENT_TYPE.LEVEL_CHANGED, this);
+                EventManager.Instance.PostNotification(EVENT_TYPE.LEVEL_CHANGED, this, _level);
+
+                _gameProgress = (float)_level / (float)_maxLevel;
             }
         }
-    }
-
-    void InitResetOptions()
-    {
-        E_reset += JumpPosControll.Instance.ResetOptions;
-        E_reset += MapManager.Instance.ResetOptions;
-        E_reset += BotCreator.Instance.ResetOptions;
-        E_reset += DeathManager.Instance.ResetOptions;
-        E_reset += FindObjectOfType<ItemCreator>().ResetOptions;
-        E_reset += Character.Instance.ResetOptions;
-        E_reset += InputManager.Instance.ResetOptions;
-        E_reset += CharacterControll.Instance.ResetOptions;
-        E_reset += RockCreator.Instance.ResetOptions;
-        E_reset += CameraControll.Instance.ResetOptions;
-        E_reset += Water.Instance.ResetOptions;
-        E_reset += ScoreManager.Instance.ResetOptions;
-
-        _score = 0;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -134,8 +101,16 @@ public class GameManager : MonoBehaviour
         if (scene.buildIndex == 1)
         {
             DOTween.Clear();
-            E_reset();
+            _gameProgress = 0;
+
+            EventManager.Instance.PostNotification(EVENT_TYPE.GAME_RESTART, this);
         }
-            
     }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(1);
+    }
+
+
 }

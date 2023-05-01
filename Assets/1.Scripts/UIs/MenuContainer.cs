@@ -9,8 +9,13 @@ public class MenuContainer : MonoBehaviour
     Button[] _btns;
     int count;
 
+    bool _isInteractable = true;
+
     private void Start()
     {
+        if (GetComponentInParent<CanvasControll>() != CanvasControll.Instance)
+            return;
+
         count = transform.childCount;
         _btns = new Button[count];
 
@@ -29,6 +34,7 @@ public class MenuContainer : MonoBehaviour
 
         if(eventType == EVENT_TYPE.GAME_RESTART)
         {
+            InitBtns();
             BtnsInteracterble(true);
         }
     }
@@ -41,11 +47,16 @@ public class MenuContainer : MonoBehaviour
         }
     }
 
-    void BtnsInteracterble(bool value)
+    void BtnsInteracterble(bool value) // 이과정이 두번작동됨
     {
+        if (_isInteractable == value)
+            return;
+
         for (int i = 0; i < count; i++)
         {
             _btns[i].interactable = value;
         }
+
+        _isInteractable = value;
     }
 }

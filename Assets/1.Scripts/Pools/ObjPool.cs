@@ -144,13 +144,15 @@ public class ObjPool : MonoBehaviour
         _itemTypeList.Add(_superJumpItemPoolType);
 
         Initialize<IStairType>(20,_stairTypeList);
-        Initialize<I_ItemType>(2,_itemTypeList);
+        Initialize<I_ItemType>(5,_itemTypeList);
     }
 
     private void Initialize<T>(int count,List<ObjectPoolType> typeList) where T : IPoolingType
     {
         foreach (ObjectPoolType poolType in typeList)
         {
+            poolType._poolCount = count;
+
             for (int i = 0; i < count; i++)
             {
                 poolType.Push(CreateNewObj<T>(poolType));
@@ -179,7 +181,15 @@ public class ObjPool : MonoBehaviour
         }
         else
         {
-            obj = CreateNewObj<T>(poolType);
+            int count = poolType._poolCount*2;
+            poolType._poolCount = count;
+
+            for (int i = 0; i < count; i++)
+            {
+                poolType.Push(CreateNewObj<T>(poolType));
+            }
+
+            obj = poolType.Pop();
         }
 
         obj.gameObject.SetActive(true);

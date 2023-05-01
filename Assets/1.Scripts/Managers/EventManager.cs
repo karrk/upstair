@@ -9,12 +9,14 @@ public enum EVENT_TYPE
     GAME_INPUT_SIGN,
     GAME_RESTART,
     CHARACTER_DEAD,
+    DEAD_ANIM_FIN,
     CHARACTER_JUMP,
     CAMERA_SHAKE,
     CONTACT_STAIR,
     SCORE_OVER,
     SCORE_10,
     LEVEL_CHANGED,
+    CONTINUE,
 }
 
 public class EventManager : MonoBehaviour
@@ -50,14 +52,7 @@ public class EventManager : MonoBehaviour
     public Dictionary<EVENT_TYPE, List<OnEvent>> _listeners
         = new Dictionary<EVENT_TYPE, List<OnEvent>>();
 
-    //public void ResetOptions()
-    //{
-    //    foreach (var item in _listeners)
-    //    {
-    //        if (!item.Value.Equals(null))
-    //            item.Value.RemoveRange(0, item.Value.Count);
-    //    }
-    //}
+    Dictionary<EVENT_TYPE, List<GameObject>> listenerDic = new Dictionary<EVENT_TYPE, List<GameObject>>();
 
     public void AddListener(EVENT_TYPE eventType, OnEvent listener)
     {
@@ -72,6 +67,8 @@ public class EventManager : MonoBehaviour
         listenList = new List<OnEvent>();
         listenList.Add(listener);
         _listeners.Add(eventType, listenList);
+
+        
     }
 
     public void PostNotification(EVENT_TYPE eventType, Component sender, object param = null)

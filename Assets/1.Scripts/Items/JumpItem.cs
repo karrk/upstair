@@ -10,10 +10,16 @@ public class JumpItem : MonoBehaviour, I_ItemType
 
     JumpOption jumpOption;
 
-    private int _currStairNum;
+    private int _currentStairNum;
 
     private int _plusStairCount;
-    private float _jumpDuration;
+
+    private float _itemJumpDuration;
+
+    public float Duration
+    {
+        get { return _itemJumpDuration; }
+    }
 
     void OnEnable()
     {
@@ -25,39 +31,39 @@ public class JumpItem : MonoBehaviour, I_ItemType
         jumpOption = GetComponent<JumpOption>();
 
         _plusStairCount = JumpOption._countList[(int)jumpOption._jumpType];
-        _jumpDuration = JumpOption._durationList[(int)jumpOption._jumpType];
+        _itemJumpDuration = JumpOption._durationList[(int)jumpOption._jumpType];
 
-        Transform myParent = this.transform.parent.Find("ItemPool");
+        Transform myParent = FindObjectOfType<ItemPoolManager>().transform;
         this.transform.SetParent(myParent);
     }
 
-    void FixedUpdate()
+    private void OnTriggerEnter(Collider other)
     {
-        if (this.transform.position.y + I_ItemType.ReturnDistance <= Character.Instance.Pos.y)
-        {
-            ObjPool.Instance.ReturnObj(ObjType, this.gameObject);
-        }
+        if (other.CompareTag("Water"))
+            ReturnItem();
     }
 
     public void Use()
     {
-        Enum type = SearchTargetStair().ObjType;
-        GameObject targetStair = SearchTargetStair().gameObject;
+        Stair targetStair = SearchTargetStair();
 
-        CharacterControll.Instance.Jump(targetStair.transform.position + SearchTargetStair().BasePos, 0.8f, _jumpDuration);
+        if(targetStair == null)
+        { Debug.Log("¿¡·¯"); }
 
-        Character.Instance.SetCurrentStair(targetStair);
+        CharacterControll.Instance.Jump(targetStair.transform.position + targetStair.BasePos, 0.8f, _itemJumpDuration);
+
+        Character.Instance.SetCurrentStair(targetStair.gameObject);
 
         ObjPool.Instance.ReturnObj(this.ObjType, this.gameObject);
     }
 
     private Stair SearchTargetStair()
     {
-        Stair targetStair = null;
+        Stair targetStair;
 
-        _currStairNum = StairCreator._stairDic[Character.Instance.CurrentStair];
+        _currentStairNum = int.Parse(Character.Instance.CurrentStair.name);
 
-        int targetNum = _currStairNum + _plusStairCount;
+        int targetNum = _currentStairNum + _plusStairCount;
 
         //if (!StairCreator._stairDic.ContainsValue(targetNum))
         //    targetNum++;
@@ -66,22 +72,26 @@ public class JumpItem : MonoBehaviour, I_ItemType
 
         while (true)
         {
-            if (StairCreator._stairDic.ContainsValue(targetNum))
-            {
-                targetStair = StairCreator._stairDic.FirstOrDefault(x => x.Value == targetNum).Key.GetComponent<Stair>();
-            }
-            else
+            if (!StairCreator._dic.ContainsKey(targetNum))
             {
                 targetNum++;
                 continue;
             }
 
+            targetStair = StairCreator._dic[targetNum].GetComponent<Stair>();
+
             if (targetStair.isMetroLine)
+            {
                 targetNum++;
-            else
-                return targetStair;
+                continue;
+            }
+
+            return targetStair;
         }
     }
 
-
+    public void ReturnItem()
+    {
+        ObjPool.Instance.ReturnObj(ObjType, this.gameObject);
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,6 +47,17 @@ public class BotCreator : MonoBehaviour
     {
         this.transform.position = new Vector3(0, StartDistace, StartDistace);
         _initPos = this.transform.position;
+
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+    }
+
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            this.transform.position = _initPos;
+            _timer = 0f;
+        }
     }
 
     void CreateBot()
@@ -76,12 +88,6 @@ public class BotCreator : MonoBehaviour
                 _createReady = false;
             }
         }
-    }
-
-    public void ResetOptions()
-    {
-        this.transform.position = _initPos;
-        _timer = 0f;
     }
 
     public void Move()

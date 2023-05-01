@@ -42,13 +42,16 @@ public class MapManager : MonoBehaviour
         SetRandomMap();
         _rotationID = _skybox.material.shader.GetPropertyNameId(2);
         _skybox.material.SetFloat(_rotationID, 0);
+
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART,OnEvent);
     }
 
-    public void ResetOptions()
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
         SetRandomMap();
         _skybox.material.SetFloat(_rotationID, 0);
     }
+
 
     void SetRandomMap()
     {

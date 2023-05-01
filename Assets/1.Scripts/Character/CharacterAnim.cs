@@ -44,7 +44,8 @@ public class CharacterAnim : MonoBehaviour
         
 
         EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_JUMP, OnEvent);
-        //EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTINUE, OnEvent);
     }
 
     void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
@@ -57,6 +58,11 @@ public class CharacterAnim : MonoBehaviour
             _anim.Play(_defaultStateHashCode, 0, 0);
 
             PlayJumpAnim();
+        }
+
+        if(eventType == EVENT_TYPE.GAME_RESTART || eventType == EVENT_TYPE.CONTINUE)
+        {
+            _anim.Rebind();
         }
     }
 

@@ -53,21 +53,14 @@ public class CameraControll : MonoBehaviour
     void Start()
     {
         EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
-        EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_DEAD, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.DEAD_ANIM_FIN, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTINUE, OnEvent);
 
         _underWaterFilter = transform.GetChild(0).gameObject;
         bubbleFx = transform.GetChild(1).GetComponent<ParticleSystem>(); // ����
         _initPos = this.transform.position;
         _initRot = this.transform.rotation;
-    }
-
-    public void ResetOptions()
-    {
-        _underWaterFilter.SetActive(false);
-
-        this.transform.rotation = _initRot;
-        this.transform.position = _initPos;
-        //EventManager.Instance.AddListener(EVENT_TYPE.CAMERA_SHAKE, OnEvent);
     }
 
     void FixedUpdate()
@@ -82,9 +75,25 @@ public class CameraControll : MonoBehaviour
             StartCoroutine(ShakeCam(CalculateShakePower((float)param)));
         }
 
-        if(eventType == EVENT_TYPE.CHARACTER_DEAD)
+        if(eventType == EVENT_TYPE.DEAD_ANIM_FIN)
         {
-            RotateDown();
+            StartCoroutine(RotateDown(1));
+        }
+
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            _underWaterFilter.SetActive(false);
+            bubbleFx.gameObject.SetActive(false);
+
+            this.transform.rotation = _initRot;
+            this.transform.position = _initPos;
+        }
+
+        if(eventType == EVENT_TYPE.CONTINUE)
+        {
+            _underWaterFilter.SetActive(false);
+            bubbleFx.gameObject.SetActive(false);
+            this.transform.rotation = _initRot;
         }
     }
 
@@ -116,17 +125,23 @@ public class CameraControll : MonoBehaviour
         if(Character.Instance.IsDead)
         return;
 
-        // this.transform.DOMove(AddVector(Character.Instance.Pos), 0.5f).SetRecyclable(true);
         this.transform.position = Vector3.Slerp
             (this.transform.position, AddVector(Character.Instance.Pos), CamMoveTime);
     }
 
-    void RotateDown()
+    IEnumerator RotateDown(float increaseValue)
     {
-        transform.rotation = Quaternion.Slerp(transform.rotation,
-            Quaternion.Euler(50, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z),
-            2f*Time.deltaTime);
+        float limitValue = 50;
 
+        while (true)
+        {
+            if (transform.rotation.eulerAngles.x >= limitValue)
+                break;
+
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x + increaseValue, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+
+            yield return null;
+        }
     }
 
     Vector3 AddVector(Vector3 offsetPos)

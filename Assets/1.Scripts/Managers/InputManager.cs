@@ -52,9 +52,9 @@ public class InputManager : MonoBehaviour
         get { return _inputType; }
         set
         {
-            //if (value != InputMode.None)
+            if(value != InputMode.None)
                 EventManager.Instance.PostNotification(EVENT_TYPE.GAME_INPUT_SIGN, this);
-            
+
             _inputType = value;
         }
     }
@@ -65,22 +65,14 @@ public class InputManager : MonoBehaviour
     Vector3 _inputStartPos;
     Vector3 _inputEndPos;
 
-    MoveBtnControll _moveBtnControll;
-
-    public void ResetOptions()
-    {
-        _inputType = InputMode.None;
-        characterControll = FindObjectOfType<CharacterControll>();
-    }
-
     void Start()
     {
         characterControll = FindObjectOfType<CharacterControll>();
-        _moveBtnControll = FindObjectOfType<MoveBtnControll>();
 
         DetectInput += characterControll.CharacterJumpAction;
 
         EventManager.Instance.AddListener(EVENT_TYPE.MOVE_BTN, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
     }
 
     private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
@@ -98,6 +90,11 @@ public class InputManager : MonoBehaviour
             EventSystem.current.UpdateModules();
 
             //Input_Type = InputMode.None;
+        }
+
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            _inputType = InputMode.None;
         }
     }
 

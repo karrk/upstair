@@ -7,8 +7,6 @@ public class Stair : MonoBehaviour , IStairType
 {
     public Enum ObjType { get; set; }
 
-    private Vector3 _basePos;
-
     public Vector3 BasePos
     {
         get { return GetBasePos(); }
@@ -25,8 +23,6 @@ public class Stair : MonoBehaviour , IStairType
 
     void Start()
     {
-        //_basePos = SetBasePos();
-
         Transform myParent = this.transform.parent.Find("StairPool");
         this.transform.SetParent(myParent);
     }
@@ -59,18 +55,16 @@ public class Stair : MonoBehaviour , IStairType
         }
     }
 
-    void FixedUpdate() // 이거좀 큰문제인듯 ()
+    private void OnTriggerExit(Collider other)
     {
-        if(this.transform.position.y+ IStairType.ReturnDistance <= Character.Instance.Pos.y)
-        {
-            Return();
-            StairCreator._stairDic.Remove(this.gameObject);
-        }
+        if (other.CompareTag("Water") && !Character.Instance.IsDead)
+            ReturnStair();
     }
 
-    public void Return()
+    public void ReturnStair()
     {
         ObjPool.Instance.ReturnObj(ObjType, this.gameObject);
+        StairCreator._dic.Remove(int.Parse(this.gameObject.name));
     }
 }
 

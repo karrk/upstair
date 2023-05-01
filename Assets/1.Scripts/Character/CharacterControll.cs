@@ -2,9 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class CharacterControll : MonoBehaviour
 {
+    enum JumpPos
+    {
+        UP,
+        DOUBLE,
+        LEFT,
+        RIGHT,
+    };
+
     private static CharacterControll _instance = null;
 
     public static CharacterControll Instance
@@ -48,18 +57,25 @@ public class CharacterControll : MonoBehaviour
 
     Rigidbody _rb;
 
-    enum JumpPos
-    {
-        UP,
-        DOUBLE,
-        LEFT,
-        RIGHT,
-    };
-
     void Start()
     {
         InitJumpPos();
         _rb = this.GetComponent<Rigidbody>();
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+    }
+
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            InitJumpPos();
+            _isJump = false;
+
+            if (_rb == null)
+                this.GetComponent<Rigidbody>();
+
+            SetConstraints(true);
+        }
     }
 
     void InitJumpPos()
@@ -116,19 +132,6 @@ public class CharacterControll : MonoBehaviour
         {
             _isJump = false;
         }
-    }
-
-    public void ResetOptions()
-    {
-        InitJumpPos();
-        _isJump = false;
-
-        if (_rb == null)
-            this.GetComponent<Rigidbody>();
-
-        //FloattingMode(false);
-
-        SetConstraints(true);
     }
 
     public void SetConstraints(bool setValue)

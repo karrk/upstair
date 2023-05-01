@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,9 +37,10 @@ public class JumpPosControll : MonoBehaviour
     void Start()
     {
         _initPos = this.transform.position;
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
     }
 
-    public void ResetOptions()
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
         this.transform.position = _initPos;
     }

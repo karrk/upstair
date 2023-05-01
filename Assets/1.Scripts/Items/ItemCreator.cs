@@ -10,9 +10,7 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
     const float StartPercent = 0.15f;
     const float MinPercent = 0.03f;
     
-    System.Random _rand;
-    private float _TotalCreatePercent;
-
+    float _createPercent;
     List<float> _percentList = new List<float>();
 
     private readonly Vector3 StartCreatePos = new Vector3(0, 11, 10);
@@ -29,18 +27,39 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
 
     Vector3 _initPos;
 
-    public void ResetOptions()
-    {
-        this.transform.position = _initPos;
-    }
-
     void Start()
     {
         _initPos = this.transform.position;
         _spawnPos = StartCreatePos;
-        _rand = new System.Random(System.Guid.NewGuid().GetHashCode());
 
         InitGenerationPercent();
+
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.LEVEL_CHANGED, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
+
+        _createPercent = GetCreatePercent(0);
+        GoAwayObj();
+    }
+
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            _spawnPos = _initPos;
+            _createPercent = GetCreatePercent(0);
+            GoAwayObj();
+        }
+
+        if(eventType == EVENT_TYPE.LEVEL_CHANGED)
+        {
+            _createPercent = GetCreatePercent((int)Param);
+        }
+
+        if (eventType == EVENT_TYPE.CONTACT_STAIR)
+        {
+            GoAwayObj();
+        }
     }
 
     void InitGenerationPercent()
@@ -61,13 +80,16 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
         }
     }
 
-    void FixedUpdate()
+    void GoAwayObj()
     {
-        if (isNearby(StairCreator.DISTANCE))
+        while (true)
         {
-            float randNum = (float)_rand.NextDouble();
+            if (!isNearby(StairCreator.DISTANCE))
+                break;
 
-            if (CheckCreatePercent(randNum)) 
+            float rand = Random.Range(0f, 1f);
+
+            if (CreateCheck(rand))
             {
                 ObjPool.Instance.GetObj<I_ItemType>(SetRandomItem());
                 _spawnPos = SetRandomPos(_spawnPos);
@@ -77,23 +99,19 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
         }
     }
 
-    bool CheckCreatePercent(float targetPercent)
+    bool CreateCheck(float targetPercent)
     {
-        _TotalCreatePercent = GetCreatePercent();
-
-        return _TotalCreatePercent > targetPercent;
+        return _createPercent > targetPercent;
     }
 
-    float GetCreatePercent()
+    float GetCreatePercent(int level)
     {
-        float selectPercent = _percentList[GameManager.Instance.Level];
-
-        return selectPercent;
+        return _percentList[level];
     }
 
     ObjectPoolType SetRandomItem()
     {
-        float randNum = (float)_rand.NextDouble();
+        float randNum = Random.Range(0f, 1f);
 
         ObjectPoolType poolType = null;
         float gap = float.MaxValue;
@@ -106,7 +124,6 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
                 {
                     gap = ItemPercent.percentList[i] - randNum;
                     poolType = ObjPool.Instance._itemTypeList[i];
-                    
                 }   
             }
         }
@@ -120,7 +137,7 @@ public class ItemCreator : MonoBehaviour , IDistanceInfo
 
     Vector3 SetRandomPos(Vector3 inputVec)
     {
-        float randNum = (float)_rand.NextDouble();
+        float randNum = Random.Range(0f, 1f);
 
         if (LeftAreaNum >= randNum)
             inputVec.x = -2;

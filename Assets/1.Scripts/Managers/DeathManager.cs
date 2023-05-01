@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,22 +31,25 @@ public class DeathManager : MonoBehaviour
         }
     }
 
-    public void ResetOptions()
-    {
-        for (int i = 0; i < this.gameObject.transform.childCount; i++)
-        {
-            this.gameObject.transform.GetChild(i).transform.position 
-                = this.transform.position;
-        }
-    }
-
-
     public GameObject _deathPrefab;
     Stack<GameObject> _deathObjPool = new Stack<GameObject>();
 
     void Start()
     {
-        Init();
+        Init(); // 이방법 별로
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+    }
+
+    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    {
+        if(eventType == EVENT_TYPE.GAME_RESTART)
+        {
+            for (int i = 0; i < this.gameObject.transform.childCount; i++)
+            {
+                this.gameObject.transform.GetChild(i).transform.position
+                    = this.transform.position;
+            }
+        }
     }
 
     void Init()
