@@ -1,126 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class MetroCreator : MonoBehaviour
+public class MetroCreator : Creator
 {
-    private static MetroCreator _instance;
+    protected override float StartPercent => throw new NotImplementedException();
 
-    public static MetroCreator Instacne
+    protected override float LimitPercent => throw new NotImplementedException();
+
+    protected override PoolType MyPool { get { return GetComponent<PoolType>(); } }
+
+    public override PoolObject CreateObj()
     {
-        get
-        {
-            if (_instance == null)
-                return null;
-
-            return _instance;
-        }
+        throw new NotImplementedException();
     }
 
-    void Awake()
+    internal PoolObject GetMetro(Vector3 pos)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-            Destroy(this.gameObject);
-            
-    }
+        MyPool.ReturnObj(MyPool.TotalObjCount - 1);
 
-    const float LowCreatePercent = 0.02f;
-    const float HighCreatePercent = 0.08f;  // 레벨에따른 조정 총 10 분기
+        PoolObject obj = MyPool.GetPoolObject(MyPool.TotalObjCount - 1);
+        obj.transform.position = pos;
 
-    //const float LowCreatePercent = 1f;
-    //const float HighCreatePercent = 1f;
-
-    const float MinDistance = 80f;
-    Vector3 _initPos;
-
-    public GameObject _metroLine;
-
-    Stair _targetStair;
-
-    List<float> _percentList = new List<float>();
-
-    void Start()
-    {
-        _initPos = this.transform.position;
-
-        InitGenerationPercent();
-        CheckDistance();
-
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void InitGenerationPercent()
-    {
-        float percentTotalGap = HighCreatePercent - LowCreatePercent;
-        float interval = percentTotalGap / (GameManager.Instance.MaxLevel);
-
-        for (int i = 0; i < GameManager.Instance.MaxLevel; i++)
-        {
-            float percent = LowCreatePercent + (interval * i);
-
-            if (percent > HighCreatePercent)
-                percent = HighCreatePercent;
-
-            _percentList.Add(percent);
-        }
-    }
-
-    public void Move()
-    {
-        this.transform.position += new Vector3(0, 1, 1);
-    }
-
-    public void CheckDistance()
-    {
-        while (true)
-        {
-            if (this.transform.position.y - Character.Instance.LastPosY >= MinDistance)
-                break;
-
-            else
-            {
-                Move();
-
-                if (CheckCreatePercent())
-                {
-                    MetroLineCreate();
-                }
-            }
-                
-        }
-    }
-
-
-    bool CheckCreatePercent() // 현재 분기에 맞는 퍼센트
-    {
-        float percent = Random.Range(0, 1.01f);
-        return percent < _percentList[GameManager.Instance.Level];
-    }
-
-    void MetroLineCreate()
-    {
-        GameObject obj = Instantiate(_metroLine);
-        obj.transform.position = this.transform.position;
-        obj.transform.SetParent(null);
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (scene.buildIndex == 1)
-        {
-            ResetOptions();
-        }
-    }
-
-    void ResetOptions()
-    {
-        transform.position = _initPos;
-        CheckDistance();
+        return obj;
     }
 }

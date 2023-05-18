@@ -10,14 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1745493390544770410}
   - component: {fileID: 2615026549876187584}
-  - component: {fileID: 1890544792570699111}
+  - component: {fileID: -1825941374374958589}
   m_Layer: 3
   m_Name: RightStair
   m_TagString: Stair
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1745493390544770410
 Transform:
   m_ObjectHideFlags: 0
@@ -47,7 +47,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 1, z: 0.5}
   m_Center: {x: 5, y: -0.5, z: 0.5}
---- !u!114 &1890544792570699111
+--- !u!114 &-1825941374374958589
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -56,9 +56,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2235176737531581397}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5974ce1759f4359418eee8b21cdecbb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e5b349c256cab244938e291839b70a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _basePos: {x: 5, y: 0, z: 0}
+  _isOnlyMid: 0
+  _isMetroLine: 0
 --- !u!1 &3373585617289877944
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+public enum InputType
+{
+    Up,
+    Double,
+    Left,
+    Right,
+    None,
+}
+
 public class InputManager : MonoBehaviour
 {
     private static InputManager _instance = null;
@@ -20,7 +29,7 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    public delegate void OnInput(InputMode mode);
+    public delegate void OnInput(InputType mode);
     public event OnInput DetectInput;
 
     CharacterControll characterControll;
@@ -36,23 +45,14 @@ public class InputManager : MonoBehaviour
             Destroy(this.gameObject);
     }
 
-    public enum InputMode
-    {
-        Up,
-        Double,
-        Left,
-        Right,
-        None,
-    }
+    private InputType _inputType = InputType.None;
 
-    private InputMode _inputType = InputMode.None;
-
-    public InputMode Input_Type
+    public InputType Input_Type
     {
         get { return _inputType; }
         set
         {
-            if(value != InputMode.None)
+            if(value != InputType.None)
                 EventManager.Instance.PostNotification(EVENT_TYPE.GAME_INPUT_SIGN, this);
 
             _inputType = value;
@@ -69,7 +69,7 @@ public class InputManager : MonoBehaviour
     {
         characterControll = FindObjectOfType<CharacterControll>();
 
-        DetectInput += characterControll.CharacterJumpAction;
+        //DetectInput += characterControll.CharacterJumpAction;
 
         EventManager.Instance.AddListener(EVENT_TYPE.MOVE_BTN, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
@@ -80,21 +80,21 @@ public class InputManager : MonoBehaviour
         if(eventType == EVENT_TYPE.MOVE_BTN)
         {
             if ((int)Param == (int)MOVE_Dir.Left)
-                Input_Type = InputMode.Left;
+                Input_Type = InputType.Left;
             else if((int)Param == (int)MOVE_Dir.Right)
-                Input_Type = InputMode.Right;
+                Input_Type = InputType.Right;
             else
-                Input_Type = InputMode.Up;
+                Input_Type = InputType.Up;
 
             DetectInput(_inputType);
             EventSystem.current.UpdateModules();
 
-            //Input_Type = InputMode.None;
+            //Input_Type = InputType.None;
         }
 
         if(eventType == EVENT_TYPE.GAME_RESTART)
         {
-            _inputType = InputMode.None;
+            _inputType = InputType.None;
         }
     }
 
@@ -143,28 +143,28 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            Input_Type = InputMode.Up;
+            Input_Type = InputType.Up;
             DetectInput(_inputType);
         }
             
 
         else if (Input.GetKeyDown(KeyCode.Space))
         {
-            Input_Type = InputMode.Double;
+            Input_Type = InputType.Double;
             DetectInput(_inputType);
         }
             
 
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            Input_Type = InputMode.Right;
+            Input_Type = InputType.Right;
             DetectInput(_inputType);
         }
             
 
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Input_Type = InputMode.Left;
+            Input_Type = InputType.Left;
             DetectInput(_inputType);
         }
             
@@ -205,16 +205,16 @@ public class InputManager : MonoBehaviour
             || Mathf.Abs(X_distance) >= DefaultSlideDistance + OptionSlideDistance)
         {
             if (Y_distance >= Mathf.Abs(X_distance))
-                Input_Type = InputMode.Up;
+                Input_Type = InputType.Up;
 
             else if (X_distance > 0)
-                Input_Type = InputMode.Right;
+                Input_Type = InputType.Right;
 
             else if (X_distance < 0)
-                Input_Type = InputMode.Left;
+                Input_Type = InputType.Left;
         }
         else
-            Input_Type = InputMode.Double;
+            Input_Type = InputType.Double;
     }
 
     float GetSlideDistance()

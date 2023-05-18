@@ -92,26 +92,26 @@ public class CharacterControll : MonoBehaviour
         
     }
 
-    public void CharacterJumpAction(InputManager.InputMode mode)
+    public void CharacterJumpAction(InputType mode)
     {
         if (_isJump || Character.Instance.IsDead)
             return;
 
         switch (mode)
         {
-            case InputManager.InputMode.Up:
+            case InputType.Up:
                 Jump(_jumpPosDic[(int)JumpPos.UP].position);
                 break;
 
-            case InputManager.InputMode.Double:
+            case InputType.Double:
                 Jump(_jumpPosDic[(int)JumpPos.DOUBLE].position);
                 break;
 
-            case InputManager.InputMode.Left:
+            case InputType.Left:
                 Jump(_jumpPosDic[(int)JumpPos.LEFT].position);
                 break;
 
-            case InputManager.InputMode.Right:
+            case InputType.Right:
                 Jump(_jumpPosDic[(int)JumpPos.RIGHT].position);
                 break;
 
@@ -146,14 +146,14 @@ public class CharacterControll : MonoBehaviour
         }
     }
 
-    public void FloattingMode(bool setValue)
-    {
-        StylizedWater2.FloatingTransform floating 
-            = this.GetComponent<StylizedWater2.FloatingTransform>();
+    //public void FloattingMode(bool setValue)
+    //{
+    //    StylizedWater2.FloatingTransform floating 
+    //        = this.GetComponent<StylizedWater2.FloatingTransform>();
 
-        floating.enabled = setValue;
-        _rb.isKinematic = setValue;
-    }
+    //    floating.enabled = setValue;
+    //    _rb.isKinematic = setValue;
+    //}
 
     
 }

@@ -1,39 +1,34 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ItemPercent : MonoBehaviour
 {
-    public static List<float> percentList;
+    const float BaseJump = 1;
+    const float SuperJump = 0.2f;
 
-    Dictionary<ObjPool.ItemType, float> _itemPercentDic;
+    List<float> _itemPercentList;
 
-    void Start()
+    private void Start()
     {
-        InitList();
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
+        _itemPercentList = new List<float>();
+
+        _itemPercentList.Add(BaseJump);
+        _itemPercentList.Add(SuperJump);
+
+        _itemPercentList.Sort();
     }
 
-    private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
+    internal ITEMTYPE GetRandomItem()
     {
-        if(eventType == EVENT_TYPE.GAME_RESTART)
+        float random = Random.Range(0f, 1f);
+
+        for (int i = 0; i < _itemPercentList.Count; i++)
         {
-            InitList();
+            if (random > _itemPercentList[i])
+                return (ITEMTYPE)(i);
         }
-    }
 
-    void InitList()
-    {
-        percentList = new List<float>();
-        _itemPercentDic = new Dictionary<ObjPool.ItemType, float>();
-
-        _itemPercentDic.Add(ObjPool.ItemType.JUMP, 1f);
-        _itemPercentDic.Add(ObjPool.ItemType.SUPERJUMP, 0.15f);
-
-        for (int i = 0; i < _itemPercentDic.Count; i++)
-        {
-            percentList.Add(_itemPercentDic[ObjPool.ItemType.JUMP + i]);
-        }
+        return (ITEMTYPE)_itemPercentList.Count-1;
     }
 }

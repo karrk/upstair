@@ -1,153 +1,84 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemCreator : MonoBehaviour , IDistanceInfo
+public class ItemCreator : Creator
 {
-    const float LeftAreaNum = (float)1 / 3;
-    const float RightAreaNum = (float)2 / 3;
+    protected override float StartPercent
+    { get { return 0.1f; } }
 
-    const float StartPercent = 0.15f;
-    const float MinPercent = 0.03f;
-    
-    float _createPercent;
-    List<float> _percentList = new List<float>();
+    protected override float LimitPercent
+    { get { return 0.07f; } }
 
-    private readonly Vector3 StartCreatePos = new Vector3(0, 11, 10);
+    protected override PoolType MyPool
+    { get { return GetComponent<ItemPool>(); }}
 
-    public static Vector3 _spawnPos;
+    Vector3 _spawnPos;
 
-    public float PlayerDistance
+    readonly Vector3 _offsetPos = new Vector3(3,0,-0.6f);
+
+    bool ItemCreateCheck
     {
-        get
-        {
-            return _spawnPos.y - Character.Instance.Pos.y;
-        }
+        get { return _percentList[GameManager.Instance.Level] > Random.Range(0f, 1f) ? true : false; }
     }
 
-    Vector3 _initPos;
+    int _waitCount = 10;
 
-    void Start()
+    private void Start()
     {
-        _initPos = this.transform.position;
-        _spawnPos = StartCreatePos;
-
+        _spawnPos = this.transform.position;
+        _percentList = new List<float>();
         InitGenerationPercent();
 
+        EventManager.Instance.AddListener(EVENT_TYPE.CREATOR_MOVE, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
-        EventManager.Instance.AddListener(EVENT_TYPE.LEVEL_CHANGED, OnEvent);
-        EventManager.Instance.AddListener(EVENT_TYPE.CONTACT_STAIR, OnEvent);
+        _waitCount = 10;
 
-        _createPercent = GetCreatePercent(0);
-        GoAwayObj();
+        CreateObj();
     }
 
     private void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
         if(eventType == EVENT_TYPE.GAME_RESTART)
         {
-            _spawnPos = _initPos;
-            _createPercent = GetCreatePercent(0);
-            GoAwayObj();
+            ReturnAll();
+            _waitCount = 10;
+            CreateObj();
         }
 
-        if(eventType == EVENT_TYPE.LEVEL_CHANGED)
+        if(eventType == EVENT_TYPE.CREATOR_MOVE)
         {
-            _createPercent = GetCreatePercent((int)Param);
+            this._spawnPos = (Vector3)Param + _offsetPos;
+            CreateObj();
         }
+    }
 
-        if (eventType == EVENT_TYPE.CONTACT_STAIR)
+    public override PoolObject CreateObj()
+    {
+        if(_waitCount > 0)
         {
-            GoAwayObj();
+            _waitCount--;
+            return null;
         }
+
+        if (!ItemCreateCheck)
+            return null;
+
+        PoolObject obj = MyPool.GetPoolObject((int)GetComponent<ItemPercent>().GetRandomItem());
+        obj.transform.position = _spawnPos + GetRandomPos();
+
+        return obj;
     }
 
-    void InitGenerationPercent()
+    Vector3 GetRandomPos()
     {
-        float percentGap = StartPercent - MinPercent;
-        float interval = percentGap / GameManager.Instance.MaxLevel;
+        int random = Random.Range(0, 3);
 
-        float percent = StartPercent;
-
-        for (int i = 0; i <= GameManager.Instance.MaxLevel; i++)
-        {
-            percent = StartPercent - (interval * i);
-
-            if (percent < MinPercent)
-                percent = MinPercent;
-
-            _percentList.Add(percent);
-        }
-    }
-
-    void GoAwayObj()
-    {
-        while (true)
-        {
-            if (!isNearby(StairCreator.DISTANCE))
-                break;
-
-            float rand = Random.Range(0f, 1f);
-
-            if (CreateCheck(rand))
-            {
-                ObjPool.Instance.GetObj<I_ItemType>(SetRandomItem());
-                _spawnPos = SetRandomPos(_spawnPos);
-            }
-
-            _spawnPos += new Vector3(0, 1, 1);
-        }
-    }
-
-    bool CreateCheck(float targetPercent)
-    {
-        return _createPercent > targetPercent;
-    }
-
-    float GetCreatePercent(int level)
-    {
-        return _percentList[level];
-    }
-
-    ObjectPoolType SetRandomItem()
-    {
-        float randNum = Random.Range(0f, 1f);
-
-        ObjectPoolType poolType = null;
-        float gap = float.MaxValue;
-
-        for (int i = 0; i < ItemPercent.percentList.Count; i++)
-        {
-            if(randNum < ItemPercent.percentList[i])
-            {
-                if (0 <= ItemPercent.percentList[i] - randNum && ItemPercent.percentList[i] - randNum < gap)
-                {
-                    gap = ItemPercent.percentList[i] - randNum;
-                    poolType = ObjPool.Instance._itemTypeList[i];
-                }   
-            }
-        }
-        return poolType;
-    }
-
-    public bool isNearby(float specDistance)
-    {
-        return specDistance >= PlayerDistance;
-    }
-
-    Vector3 SetRandomPos(Vector3 inputVec)
-    {
-        float randNum = Random.Range(0f, 1f);
-
-        if (LeftAreaNum >= randNum)
-            inputVec.x = -2;
-
-        else if ( RightAreaNum <= randNum)
-            inputVec.x = 2;
-
-        else
-            return inputVec;
-
-        return inputVec;
+        if (random == 0)
+            return new Vector3(-2, 0, 0);
+        else if (random == 1)
+            return new Vector3(2, 0, 0);
+        return Vector3.zero;
     }
 }

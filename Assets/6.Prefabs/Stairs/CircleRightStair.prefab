@@ -9,15 +9,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4618911282161587181}
-  - component: {fileID: 1984772859951275070}
   - component: {fileID: 5920856461465291368}
+  - component: {fileID: 158964683972640364}
   m_Layer: 0
   m_Name: CircleRightStair
   m_TagString: Stair
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4618911282161587181
 Transform:
   m_ObjectHideFlags: 0
@@ -34,18 +34,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1984772859951275070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4618911282161587178}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5974ce1759f4359418eee8b21cdecbb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &5920856461465291368
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59,6 +47,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.6, y: 1, z: 0.6}
   m_Center: {x: 5, y: -0.5, z: 0.5}
+--- !u!114 &158964683972640364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4618911282161587178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5b349c256cab244938e291839b70a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _basePos: {x: 5, y: 0, z: 0}
+  _isOnlyMid: 0
+  _isMetroLine: 0
+  _isCircle: 1
 --- !u!1001 &4618911280869726458
 PrefabInstance:
   m_ObjectHideFlags: 0

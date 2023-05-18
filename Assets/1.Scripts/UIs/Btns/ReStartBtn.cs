@@ -5,11 +5,6 @@ using UnityEngine;
 
 public class ReStartBtn : BaseButton
 {
-    protected override void Init()
-    {
-        base.Init();
-    }
-
     protected override void BtnAction()
     {
         StartCoroutine(Restart());

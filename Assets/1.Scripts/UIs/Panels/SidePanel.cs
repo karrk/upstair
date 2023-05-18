@@ -25,7 +25,7 @@ public class SidePanel : BasePanel
         {
             if(transform.position == _initPos && image.raycastTarget == true)
             {
-                UpLoadPanel();
+                //UpLoadPanel();
             }
         }
 

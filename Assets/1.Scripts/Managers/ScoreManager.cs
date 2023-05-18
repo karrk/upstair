@@ -79,9 +79,9 @@ public class ScoreManager : MonoBehaviour
 
         if(eventType == EVENT_TYPE.CONTACT_STAIR)
         {
-            if ((Stair)param != null)
+            if ((StairType)param != null)
             {
-                Stair stair = (Stair)param;
+                StairType stair = (StairType)param;
                 _currentScore = int.Parse(stair.name);
             }
 
@@ -92,6 +92,7 @@ public class ScoreManager : MonoBehaviour
         if(eventType == EVENT_TYPE.GAME_RESTART)
         {
             _finScoreText.text = 0.ToString();
+            _currentScore = 0;
             LoadBestScore();
         }
     }

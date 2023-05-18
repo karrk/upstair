@@ -41,8 +41,6 @@ public class CharacterAnim : MonoBehaviour
             _anim.SetTrigger("Dead");
         }
 
-        
-
         EventManager.Instance.AddListener(EVENT_TYPE.CHARACTER_JUMP, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.CONTINUE, OnEvent);
@@ -71,7 +69,7 @@ public class CharacterAnim : MonoBehaviour
         _anim.SetTrigger("Jump");
     }
 
-    void PlayJumpItemAnim(bool value)
+    internal void PlayJumpItemAnim(bool value)
     {
         _anim.SetBool("JumpItem",value);
     }
@@ -83,11 +81,7 @@ public class CharacterAnim : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.CompareTag("Item"))
-        {
-            PlayJumpItemAnim(true);
-        }
-        else if (collision.gameObject.CompareTag("Stair"))
+        if (collision.gameObject.CompareTag("Stair"))
         {
             PlayJumpItemAnim(false);
         }

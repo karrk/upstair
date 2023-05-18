@@ -21,7 +21,7 @@ public class FadePanel : BasePanel
     {
         if(eventType == EVENT_TYPE.GAME_RESTART && (bool)param == true)
         {
-            UpLoadPanel();
+            //UpLoadPanel();
         }
     }
 

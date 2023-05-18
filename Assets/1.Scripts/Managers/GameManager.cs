@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
 
         DOTween.Init(false, false, LogBehaviour.ErrorsOnly).SetCapacity(200, 100);
         Application.targetFrameRate = 60;
-        Screen.SetResolution(720, 1280, true);
+        Screen.SetResolution(720, 1544, true);
     }
 
     const int _maxStair = 1000; // 테스트모드

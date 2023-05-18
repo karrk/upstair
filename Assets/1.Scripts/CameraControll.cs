@@ -18,15 +18,6 @@ public class CameraControll : MonoBehaviour
         }
     }
 
-    const float CamMoveTime = 0.1f;
-
-    const float ShakeMaxPower = 0.3f;
-    const float ShakeMinPower = 0.001f;
-    float inclination;
-
-    GameObject _underWaterFilter;
-    ParticleSystem bubbleFx;
-
     void Awake()
     {
         if (_instance == null)
@@ -38,9 +29,18 @@ public class CameraControll : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-
-        inclination = -(ShakeMaxPower - ShakeMinPower) / StairCreator.DISTANCE; // ���� ���
     }
+
+    const float CamMoveTime = 0.1f;
+
+    const float ShakeMaxPower = 0.3f;
+    const float ShakeMinPower = 0.001f;
+    float inclination = -(ShakeMaxPower - ShakeMinPower) / 100;
+
+    GameObject _underWaterFilter;
+    ParticleSystem bubbleFx;
+
+    
 
     [Range(0.01f, 1)]
     public float _camSpeed = 0.05f;

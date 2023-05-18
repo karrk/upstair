@@ -69,4 +69,9 @@ public class UnderPanel : BasePanel
                 break;
         }
     }
+
+    protected override void MyAction()
+    {
+
+    }
 }

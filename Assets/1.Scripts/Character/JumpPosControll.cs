@@ -54,4 +54,9 @@ public class JumpPosControll : MonoBehaviour
     {
         return (int)(Mathf.RoundToInt(Character.Instance.Pos.y) - (Character.Instance.LastPosY));
     }
+
+    internal Vector3 GetJumpPos(InputType type)
+    {
+        return transform.GetChild((int)type).position;
+    }
 }

@@ -21,7 +21,7 @@ public class Character : MonoBehaviour
     public delegate void OnStair();
     public event OnStair E_colStair;
 
-    private I_ItemType _item;
+    private ItemType _item;
 
     private Vector3 _initPos;
     private Quaternion _initRotation;
@@ -40,9 +40,9 @@ public class Character : MonoBehaviour
         get { return _lastPosY; }
     }
 
-    private GameObject _currentStair;
+    private StairType _currentStair;
 
-    public GameObject CurrentStair
+    public StairType CurrentStair
     {
         get { return _currentStair; }
     }
@@ -61,6 +61,8 @@ public class Character : MonoBehaviour
     public Vector3 SafeOffset { get { return _safeOffset; } }
 
     bool _itemUsing = false;
+
+    bool _isInvincible = false;
 
     void Awake()
     {
@@ -83,9 +85,6 @@ public class Character : MonoBehaviour
         _lastPosY = Pos.y;
 
         E_colStair += JumpPosControll.Instance.Move;
-        E_colStair += BotCreator.Instance.Move;
-        E_colStair += MetroLimitor.Instacne.Move;
-        E_colStair += MetroCreator.Instacne.CheckDistance;
 
         EventManager.Instance.AddListener(EVENT_TYPE.GAME_RESTART, OnEvent);
         EventManager.Instance.AddListener(EVENT_TYPE.CONTINUE, OnEvent);
@@ -106,6 +105,7 @@ public class Character : MonoBehaviour
             _collider.enabled = true;
             GetComponent<Rigidbody>().isKinematic = false;
             _itemUsing = false;
+            _isInvincible = false;
         }
 
         if(eventType == EVENT_TYPE.CONTINUE)
@@ -126,7 +126,7 @@ public class Character : MonoBehaviour
 
     Vector3 SetRetryPos()
     {
-        float xValue = CurrentStair.GetComponent<Stair>().BasePos.x - 3;
+        float xValue = CurrentStair.GetComponent<StairType>()._basePos.x - 3;
         float yValue = CurrentStair.transform.position.y;
 
         return new Vector3(xValue,
@@ -137,6 +137,9 @@ public class Character : MonoBehaviour
 
     void DeadLogic()
     {
+        if (_isInvincible)
+            return;
+
         _isDead = true;
         _collider.enabled = false;
         EventManager.Instance.PostNotification(EVENT_TYPE.CHARACTER_DEAD, this);
@@ -155,7 +158,7 @@ public class Character : MonoBehaviour
         _lastPosY = Pos.y;
     }
 
-    public void SetCurrentStair(GameObject stair)
+    public void SetCurrentStair(StairType stair)
     {
         _currentStair = stair;
     }
@@ -164,33 +167,22 @@ public class Character : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Stair"))
         {
-            Stair stair;
+            StairType stair;
 
-            if(!collision.gameObject.TryGetComponent<Stair>(out stair))
+            if(!collision.gameObject.TryGetComponent<StairType>(out stair))
             {
                 Debug.Log("캐릭터 - 계단충돌 에러");
+                return;
             }
 
-            SetCurrentStair(collision.gameObject);
+            SetCurrentStair(stair);
 
             EventManager.Instance.PostNotification(EVENT_TYPE.CONTACT_STAIR, this, stair);
             
             E_colStair();
 
             UpdateLastPos();
-        }
-
-        if (collision.gameObject.CompareTag("Item") && !_itemUsing)
-        {
-            if (collision.gameObject.TryGetComponent<I_ItemType>(out I_ItemType item))
-            {
-                this._item = item;
-            }
-            item.Use();
-
-            _itemUsing = true;
-
-            StartCoroutine(itemUseStateFalse(item.Duration));
+            _isInvincible = false;
         }
     }
 
@@ -205,6 +197,22 @@ public class Character : MonoBehaviour
         {
             CrushKill();
         }
+
+        if (other.gameObject.CompareTag("JumpItem") && !_itemUsing)
+        {
+            if (other.gameObject.TryGetComponent<JumpItemType>(out JumpItemType item))
+            {
+                this._item = item;
+            }
+
+            GetComponent<CharacterAnim>().PlayJumpItemAnim(true);
+            item.Use();
+            
+            _itemUsing = true;
+            _isInvincible = true;
+
+            StartCoroutine(itemUseStateFalse(item.UseDuration));
+        }
     }
 
     public void CrushKill()
@@ -214,7 +222,14 @@ public class Character : MonoBehaviour
             DeadLogic();
             GetComponent<CharacterAnim>().PlayCruchKillAnim();
         }
+    }
 
+    public void KillPlayer()
+    {
+        if (!_isDead)
+        {
+            DeadLogic();
+        }
     }
 
     IEnumerator itemUseStateFalse(float delayTime)

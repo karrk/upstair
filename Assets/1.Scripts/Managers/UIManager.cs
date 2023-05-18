@@ -85,15 +85,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
-    {
-        if (IPanel.CurrentPanel != null)
-        {
-            IPanel.CurrentPanel.PanelAction();
-            IPanel.CurrentPanel = null;
-        }
-    }
-
     IEnumerator MoveBtnAction()
     {
         while (true)

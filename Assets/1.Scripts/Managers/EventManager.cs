@@ -17,6 +17,7 @@ public enum EVENT_TYPE
     SCORE_10,
     LEVEL_CHANGED,
     CONTINUE,
+    CREATOR_MOVE,
 }
 
 public class EventManager : MonoBehaviour

@@ -2,34 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Metro : MonoBehaviour
+public class Metro : PoolObject
 {
-    Rigidbody[] rigidbodies;
+    internal bool _isFinish;
+    float _speed = 25f;
 
-    void Start()
+    Vector3 _initPos;
+
+    internal void SetStartPos(Vector3 pos)
     {
-        rigidbodies = new Rigidbody[transform.childCount];
-        FindRigidBodys();
-
-        AddForce(1500);
+        this._initPos = pos;
     }
 
-    void AddForce(int power)
+    internal void Move()
     {
-        foreach (Rigidbody rb in rigidbodies)
-        {
-            rb.AddForce(new Vector3(-1 * power, 0, 0), ForceMode.Impulse);
-        }
+        if (!this.gameObject.activeSelf)
+            return;
+
+        StartCoroutine(MoveRoutine(_speed));
     }
 
-    void FindRigidBodys()
+    internal void SetSpeed(float value)
     {
-        for (int i = 0; i < transform.childCount; i++)
+        this._speed = value;
+    }
+
+    IEnumerator MoveRoutine(float Speed)
+    {
+        _isFinish = false;
+
+        while (this.gameObject.activeSelf)
         {
-            if(transform.GetChild(i).TryGetComponent<Rigidbody>(out Rigidbody rb))
-            {
-                rigidbodies[i] = rb;
-            }
+            if (_isFinish)
+                break;
+
+            this.transform.position += new Vector3(-1, 0, 0) * Speed * Time.deltaTime;
+
+            if (transform.position.x < -50)
+                _isFinish = true;
+
+            yield return null;
         }
+
+        transform.position = _initPos;
     }
 }

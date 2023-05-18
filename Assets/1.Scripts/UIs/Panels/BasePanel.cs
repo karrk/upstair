@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasePanel : MonoBehaviour, IPanel
+public abstract class BasePanel : MonoBehaviour
 {
     protected Vector3 _initPos;
 
@@ -17,18 +17,5 @@ public class BasePanel : MonoBehaviour, IPanel
         
     }
 
-    public void PanelAction()
-    {
-        MyAction();
-    }
-
-    public void UpLoadPanel()
-    {
-        IPanel.CurrentPanel = this;
-    }
-
-    protected virtual void MyAction()
-    {
-
-    }
+    protected abstract void MyAction();
 }
